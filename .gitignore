@@ -57,9 +57,3 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
-
-#Ignore all .meta files 
-*.meta
-#But not source files with postfix. 
-!*.*.meta
-
