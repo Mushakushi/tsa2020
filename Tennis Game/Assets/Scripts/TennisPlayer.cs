@@ -32,8 +32,6 @@ public class TennisPlayer : MonoBehaviour
 
     private void FixedUpdate()
     {
-        
-
         //Moves player
         Move(targetDirection); 
     }
