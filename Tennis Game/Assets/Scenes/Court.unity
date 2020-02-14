@@ -300,6 +300,7 @@ MonoBehaviour:
   hitForce: 5
   moveSpeed: 100
   aimTarget: {fileID: 1979548057}
+  netPositionTop: {fileID: 0}
   targetDirection: {x: 0, y: 0, z: 0}
   rb: {fileID: 954904919}
 --- !u!54 &954904919
@@ -640,7 +641,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1686891924
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -669,6 +670,7 @@ MonoBehaviour:
   hitForce: 3
   moveSpeed: 50
   aimTarget: {fileID: 954904917}
+  netPositionTop: {fileID: 1864518889}
   targetDirection: {x: 0, y: 0, z: 0}
   rb: {fileID: 1686891926}
   ball: {fileID: 0}
@@ -763,6 +765,36 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 180.00002, z: 0}
+--- !u!1 &1864518888
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1864518889}
+  m_Layer: 0
+  m_Name: Net Top
+  m_TagString: Net Top
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1864518889
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1864518888}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1865342010
 GameObject:
   m_ObjectHideFlags: 0

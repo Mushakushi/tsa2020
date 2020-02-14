@@ -17,12 +17,12 @@ public class Player : TennisPlayer
         ClampPosition(); 
     }
 
-    protected override void hitBall(Rigidbody ball_rb, Vector3 dir)
+    protected override void hitBall(Rigidbody ball_rb, Vector3 dir, float force)
     {
         if (Input.GetMouseButtonDown(0))
         {
             //hit the ball 
-            ball_rb.velocity = dir.normalized * hitForce + new Vector3(0, 3, 0);
+            ball_rb.velocity = dir.normalized * hitForce + new Vector3(0, force, 0);
         }
     }
 

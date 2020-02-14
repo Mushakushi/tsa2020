@@ -11,6 +11,8 @@ public class TennisPlayer : MonoBehaviour
 
     [Header("Aiming")]
     [SerializeField] protected Transform aimTarget;
+    [SerializeField] protected Transform netPositionTop;
+    [SerializeField] protected float slope; 
 
     [Header("Movement")]
     [SerializeField] protected Vector3 targetDirection; 
@@ -22,6 +24,7 @@ public class TennisPlayer : MonoBehaviour
     void Start()
     { 
         rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
+        netPositionTop = GameObject.FindGameObjectWithTag("Net Top").transform; 
     }
 
     // Update is called once per frame
@@ -57,12 +60,13 @@ public class TennisPlayer : MonoBehaviour
             //get rigidbody 
             Rigidbody ball_rb = other.GetComponent<Rigidbody>();
             //direction that we are hitting the ball 
-            Vector3 dir = aimTarget.position - transform.position; 
+            Vector3 dir = aimTarget.position - transform.position;
+            slope = (netPositionTop.position.z + transform.position.z) / netPositionTop.position.y;
 
-            hitBall(ball_rb, dir);
+            hitBall(ball_rb, dir, slope);
         }
     }
 
     //Child classes will define how the process of hitting the ball works 
-    protected virtual void hitBall(Rigidbody ball, Vector3 direction) { }
+    protected virtual void hitBall(Rigidbody ball, Vector3 direction, float slope) { }
 }

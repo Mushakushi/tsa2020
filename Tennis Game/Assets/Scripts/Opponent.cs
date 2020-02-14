@@ -23,9 +23,9 @@ public class Opponent : TennisPlayer
             new Vector3(ball.transform.position.x, transform.position.y, transform.position.z), moveSpeed * Time.deltaTime); 
     }
 
-    protected override void hitBall(Rigidbody ball_rb, Vector3 dir)
+    protected override void hitBall(Rigidbody ball_rb, Vector3 dir, float force)
     {
         //hit the ball 
-        ball_rb.velocity = dir.normalized * hitForce + new Vector3(0, 3, 0);
+        ball_rb.velocity = dir.normalized * hitForce + new Vector3(0, force, 0);
     }
 }
