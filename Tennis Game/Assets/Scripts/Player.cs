@@ -23,7 +23,7 @@ public class Player : TennisPlayer
         rb.velocity = targetDirection * moveSpeed * Time.deltaTime;
     }
 
-    protected override void hitBall(GameObject ball)
+    protected override void hitBall(Rigidbody ball)
     {
         //if we succssesfully hit the ball 
         if (Input.GetMouseButton(0))

@@ -10,9 +10,7 @@ public class TennisPlayer : MonoBehaviour
     [SerializeField] protected float moveSpeed;
 
     [Header("Aiming")]
-    [SerializeField] protected GameObject ball;
     [SerializeField] protected Rigidbody ball_rb;
-    [SerializeField] public bool canMoveBall = true; //accessible by BallCollsionSender (self-explanatory)
     [SerializeField] protected Transform aimTarget;
     [SerializeField] protected Transform netPositionTop;
     [SerializeField] protected float step = 0.01f; //how to much to increment over bezier curve path 
@@ -27,8 +25,7 @@ public class TennisPlayer : MonoBehaviour
     void Start()
     { 
         rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
-        ball = GameObject.FindGameObjectWithTag("Ball"); //ball tennis players are vying to hit 
-        ball_rb = ball.GetComponent<Rigidbody>(); //rigidbody of said ball
+        ball_rb = GameObject.FindGameObjectWithTag("Ball").GetComponent<Rigidbody>(); //rigidbody of the ball the tennis player are vying to hit 
         netPositionTop = GameObject.FindGameObjectWithTag("Net Top").transform; //top position of the net 
     }
 
@@ -62,55 +59,62 @@ public class TennisPlayer : MonoBehaviour
         if (other.CompareTag("Ball"))
         {
             //Attempt to hitBall(); 
-            hitBall(ball); 
+            hitBall(ball_rb); 
         }
     }
 
     //Child classes will define how the process of hitting the ball works 
-    protected virtual void hitBall(GameObject ball) { }
+    protected virtual void hitBall(Rigidbody ball) { }
     
     //Function to move the ball, wil be called in child classes, as hitting the ball works the same way, just defined differently based on hitBall()
-    protected IEnumerator MoveBall(GameObject ball)
+    protected IEnumerator MoveBall(Rigidbody ball)
     {
         //Reset velocity of the ball, as to not build up uneccesary amount during rallying the ball
-        ball_rb.velocity = Vector3.zero; 
+        ball.velocity = Vector3.zero; 
 
         //disable gravity 
-        ball_rb.useGravity = false;
+        ball.useGravity = false;
 
         //Store previous position so that we can make a velocity calculation once the coroutine is finished 
         Vector3 previous = Vector3.zero; 
-        //moves ball along bezier curve across multiple frames (while it is outside of another collider) 
-        while (canMoveBall)
+        //moves ball along bezier curve across multiple frames 
+        //move the ball
+        for (float i = 0f; i <= 1f; i += step)
         {
-            //move the ball
-            for (float i = 0f; i <= 1f; i += step)
-            {
-                previous = ball.transform.position; //set previous transform
-                ball.transform.position = Vector3.MoveTowards(transform.position,
-                    GetPointInPath(transform.position, netPositionTop.position, aimTarget.position, i + step), hitForce);
-                yield return null;
-            }
-            
-            //once we're done with the process don't go all anime and hit the ball a ton of times
-            break; 
+            previous = ball.transform.position; //set previous transform
+            ball.position = Vector3.MoveTowards(transform.position,
+                GetPointInPath(transform.position, netPositionTop.position, aimTarget.position, i + step), hitForce);
+            yield return null;
         }
-        
+
+        Debug.LogError(""); 
 
         //enable gravity 
-        ball_rb.useGravity = true;
+        ball.useGravity = true;
 
-        //add back velocity so that ball can bounce -- and not smack on the ground 
-        yield return new WaitUntil(()=> canMoveBall); //lambda expression
-        ball_rb.velocity = (ball.transform.position - previous).normalized / 10 /* "world scale" is small*/ / Time.deltaTime;
+        //add back velocity so that ball can bounce -- and not smack on the ground SS
+        ball.velocity = (ball.transform.position - previous) / 10 /* "world scale" is small*/ / Time.deltaTime;
     }
      
 
-    private Vector3 GetPointInPath(Vector3 playerPos, Vector3 netPosTop, Vector3 aimPos, float t)
+    private Vector3 GetPointInPath(Vector3 A /*player pos*/, Vector3 point, Vector3 C/*aim pos*/, float t)
     {
+        //there are infinite solutions for crossing these three points at any value of t, k represents the "best" (more-natural) value of t be the solution 
+        float k = CalculateBestMiddlePoint(A, netPositionTop.position, C);
+        //Re-writing of bezier curve to solve for what B should be so that the bezier curve travels through all three points 
+        Vector3 B = (point - (1 - k) * (1 - k) * A - k * k * C) / (2 * (1 - k) * k); 
         //equation of bezier curve: B(t)=(1−t)2P0+2(1−t)tP1+t2P2 where 0<=t<=1 (P0 == point 0, P1 == point 1 ...)
-        float r = 1f - t;
-        return (r * r * playerPos) + (2f * r * t * netPosTop) + (t * t * aimPos); 
+        return (1f - t) * (1f - t) * A + 2f * (1f - t) * t * B + t * t * C; 
+    }
+
+    private float CalculateBestMiddlePoint(Vector3 start, Vector3 point /*point that we are trying to go through, aka netTopPos*/, Vector3 end)
+    {
+        float a = Vector2.Distance(point, start);
+        float b = Vector2.Distance(point, end); 
+        return a / (a + b);
+
+        //thanks to @Bunny83 for all his help! 
+        //https://answers.unity.com/questions/1700903/how-to-make-quadratic-bezier-curve-through-3-point.html?_ga=2.167879905.1985838484.1581976785-1145140738.1537626484
     }
 
     private void OnDrawGizmos()
