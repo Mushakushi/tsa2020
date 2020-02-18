@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class Opponent : TennisPlayer
 {
-    [Header("Ball")]
-    [SerializeField] private GameObject ball;
+    [Header("AI Aim")]
     [SerializeField] private Transform playerAimTarget; 
 
     private void Start()
     {
-        ball = GameObject.FindGameObjectWithTag("Ball");
         playerAimTarget = GameObject.FindGameObjectWithTag("AimTarget").transform; 
     }
 
@@ -23,9 +21,9 @@ public class Opponent : TennisPlayer
             new Vector3(ball.transform.position.x, transform.position.y, transform.position.z), moveSpeed * Time.deltaTime); 
     }
 
-    protected override void hitBall(Rigidbody ball_rb, Vector3 dir, float force)
+    protected override void hitBall(GameObject ball)
     {
         //hit the ball 
-        ball_rb.velocity = dir.normalized * hitForce + new Vector3(0, force, 0);
+        StartCoroutine(MoveBall(ball)); 
     }
 }

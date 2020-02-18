@@ -17,18 +17,16 @@ public class Player : TennisPlayer
         ClampPosition(); 
     }
 
-    protected override void hitBall(Rigidbody ball_rb, Vector3 dir, float force)
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            //hit the ball 
-            ball_rb.velocity = dir.normalized * hitForce + new Vector3(0, force, 0);
-        }
-    }
-
     protected override void Move(Vector3 targetDirection)
     {
         //move player
         rb.velocity = targetDirection * moveSpeed * Time.deltaTime;
+    }
+
+    protected override void hitBall(GameObject ball)
+    {
+        //if we succssesfully hit the ball 
+        if (Input.GetMouseButton(0))
+            StartCoroutine(MoveBall(ball)); 
     }
 }

@@ -8,6 +8,7 @@ TagManager:
   - Opponent
   - AimTarget
   - Net Top
+  - Court Floor
   layers:
   - Default
   - TransparentFX
