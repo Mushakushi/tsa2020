@@ -12,13 +12,9 @@ public class Player : TennisPlayer
             Move(targetDirection);
     }
 
-    private void FixedUpdate()
-    {
-        ClampPosition(); 
-    }
-
     protected override void Move(Vector3 targetDirection)
     {
+        ClampPosition();
         //move player
         rb.velocity = targetDirection * moveSpeed * Time.deltaTime;
     }
