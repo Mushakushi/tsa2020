@@ -36,12 +36,7 @@ public class TennisPlayer : MonoBehaviour
 
     private void FixedUpdate()
     {
-        //Moves player
-        Move(targetDirection); 
     }
-
-    //ai and player move differently 
-    protected virtual void Move(Vector3 targetDirection) { }
 
     //Clamp positions to respective halves 
     protected void ClampPosition()
