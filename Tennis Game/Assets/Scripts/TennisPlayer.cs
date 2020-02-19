@@ -36,23 +36,19 @@ public class TennisPlayer : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (targetDirection.
-    }
-    
-    //player and AI move differently 
-    protected virtual void Move(Vector3 targetDirection)
-    {
-        
-    }
-
-    //Clamp positions to respective halves 
-    protected void ClampPosition()
-    {
         //clamp tennis players to bounds based on whothey are 
         transform.position = new Vector3(Mathf.Clamp(transform.position.x, -1, 1), transform.position.y,
             Mathf.Clamp(transform.position.z, gameObject.CompareTag("Opponent") ? 0f : -2f,
             gameObject.CompareTag("Opponent") ? 2f : 0f));
+        //Compute direction   
+        ComputeDirection();
+        //If we're actually moving...
+        if (targetDirection.magnitude > 0f){
+            rb.velocity = targetDirection * moveSpeed * Time.deltaTime; 
     }
+    
+    //player and AI move differently 
+    protected virtual void ComputeDirection(){}
 
     //return the ball. This is put inside of OnTriggerStay becuase each of these classes will use it anyways!
     private void OnTriggerStay(Collider other)
