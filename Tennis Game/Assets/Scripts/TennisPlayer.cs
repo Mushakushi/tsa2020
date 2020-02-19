@@ -13,7 +13,7 @@ public class TennisPlayer : MonoBehaviour
     [SerializeField] protected Rigidbody ball_rb;
     [SerializeField] protected Transform aimTarget;
     [SerializeField] protected Transform netPositionTop;
-    [SerializeField] protected float step = 0.01f; //how to much to increment over bezier curve path 
+    [SerializeField] protected float step = 0.1f; //how to much to increment over bezier curve path 
 
     [Header("Movement")]
     [SerializeField] protected Vector3 targetDirection; 
