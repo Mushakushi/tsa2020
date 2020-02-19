@@ -81,13 +81,14 @@ public class TennisPlayer : MonoBehaviour
         //move the ball
         for (float i = 0f; i <= 1f; i += step)
         {
-            previous = ball.transform.position; //set previous transform
-            ball.position = Vector3.MoveTowards(transform.position,
-                GetPointInPath(transform.position, netPositionTop.position, aimTarget.position, i + step), hitForce);
+            previous = ball.position; //set previous transform
+            ball.position = Vector3.MoveTowards(ball.position, //ith point in GetPointInPath below 
+                GetPointInPath(transform.position, netPositionTop.position, aimTarget.position, i + step/*move to the next step*/),
+                hitForce);//move as fast as hitForce dictates
             yield return null;
         }
 
-        Debug.LogError(""); 
+        Debug.LogError("MoveBall finished"); 
 
         //enable gravity 
         ball.useGravity = true;
@@ -107,10 +108,10 @@ public class TennisPlayer : MonoBehaviour
         return (1f - t) * (1f - t) * A + 2f * (1f - t) * t * B + t * t * C; 
     }
 
-    private float CalculateBestMiddlePoint(Vector3 start, Vector3 point /*point that we are trying to go through, aka netTopPos*/, Vector3 end)
+    private float CalculateBestMiddlePoint(Vector3 A, Vector3 point /*point that we are trying to go through, aka netTopPos*/, Vector3 C)
     {
-        float a = Vector2.Distance(point, start);
-        float b = Vector2.Distance(point, end); 
+        float a = Vector2.Distance(point, A);
+        float b = Vector2.Distance(point, C); 
         return a / (a + b);
 
         //thanks to @Bunny83 for all his help! 
