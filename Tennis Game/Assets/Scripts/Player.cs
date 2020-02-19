@@ -16,7 +16,7 @@ public class Player : TennisPlayer
     {
         ClampPosition();
         //move player
-        rb.velocity = targetDirection * moveSpeed * Time.deltaTime;
+        rb.velocity = targetDirection * Time.deltaTime;
     }
 
     protected override void hitBall(Rigidbody ball)
