@@ -112,7 +112,7 @@ public class TennisPlayer : MonoBehaviour
         float b = Vector2.Distance(point, C); 
         return a / (a + b);
 
-        //thanks to @Bunny83 for all his help! 
+        //thanks to @Bunny83 and @SparrowsNest for all their help! 
         //https://answers.unity.com/questions/1700903/how-to-make-quadratic-bezier-curve-through-3-point.html?_ga=2.167879905.1985838484.1581976785-1145140738.1537626484
     }
 
