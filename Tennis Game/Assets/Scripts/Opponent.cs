@@ -4,13 +4,6 @@ using UnityEngine;
 
 public class Opponent : TennisPlayer
 {
-    [Header("AI Aim")]
-    [SerializeField] private Transform playerAimTarget; 
-
-    private void Start()
-    {
-        playerAimTarget = GameObject.FindGameObjectWithTag("AimTarget").transform; 
-    }
 
     private void FixedUpdate()
     {
@@ -18,7 +11,7 @@ public class Opponent : TennisPlayer
 
         //Follow ball on the x @ certain speed 
         transform.position = Vector3.MoveTowards(transform.position,
-            new Vector3(ball_rb.transform.position.x, transform.position.y, transform.position.z), moveSpeed * Time.deltaTime); 
+            new Vector3(ball_rb.position.x, transform.position.y, transform.position.z), moveSpeed * Time.deltaTime); 
     }
 
     protected override void hitBall(Rigidbody ball)
