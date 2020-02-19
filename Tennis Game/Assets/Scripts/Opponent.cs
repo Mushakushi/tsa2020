@@ -5,13 +5,11 @@ using UnityEngine;
 public class Opponent : TennisPlayer
 {
 
-    private void FixedUpdate()
+    protected override void ComputeDirection()
     {
-        ClampPosition(); 
-
         //Follow ball on the x @ certain speed 
-        transform.position = Vector3.MoveTowards(transform.position,
-            new Vector3(ball_rb.position.x, transform.position.y, transform.position.z), moveSpeed * Time.deltaTime); 
+        targetDirection = Vector3.MoveTowards(transform.position,
+            new Vector3(ball_rb.position.x, transform.position.y, transform.position.z), moveSpeed); 
     }
 
     protected override void hitBall(Rigidbody ball)
