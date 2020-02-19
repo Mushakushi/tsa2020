@@ -23,7 +23,7 @@ public class PlayerAim : MonoBehaviour
     private void FixedUpdate()
     {
         //move to clamped bounds
-        transform.position = new Vector3(Mathf.Clamp(mousePosition.x, -1, 1), 0f,
+        transform.position = new Vector3(Mathf.Clamp(mousePosition.x, -1, 1),  transform.position.y,
             Mathf.Clamp(mousePosition.z, 0f, 2f));
     }
 

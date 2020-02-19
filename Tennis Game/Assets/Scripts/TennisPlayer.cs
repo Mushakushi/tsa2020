@@ -11,6 +11,7 @@ public class TennisPlayer : MonoBehaviour
 
     [Header("Aiming")]
     [SerializeField] protected Rigidbody ball_rb;
+    [SerializeField] public static bool isBallGrounded = false; //is the ball grounded?
     [SerializeField] protected Transform aimTarget;
     [SerializeField] protected Transform netPositionTop;
     [SerializeField] protected float step = 0.1f; //how to much to increment over bezier curve path 
@@ -43,7 +44,7 @@ public class TennisPlayer : MonoBehaviour
         //Compute direction   
         ComputeDirection();
         //If we're actually moving...
-        if (targetDirection.magnitude > 0f){
+        if (targetDirection.magnitude > 0f)
             rb.velocity = targetDirection * moveSpeed * Time.deltaTime; 
     }
     
@@ -81,16 +82,18 @@ public class TennisPlayer : MonoBehaviour
         {
             previous = ball.position; //set previous transform
             ball.position = Vector3.MoveTowards(ball.position, //ith point in GetPointInPath below 
-                GetPointInPath(transform.position, netPositionTop.position, aimTarget.position, i + step/*move to the next step*/),
+                GetPointInPath(transform.position, netPositionTop.position, aimTarget.position, i + step /*move to the next step*/),
                 hitForce);//move as fast as hitForce dictates
             yield return null;
         }
 
-        Debug.LogError("MoveBall finished"); 
+        Debug.LogError("e"); 
 
         //enable gravity 
         ball.useGravity = true;
 
+        //Wait Until the ball is grounded, and, then, bounce it 
+        yield return new WaitUntil(() => isBallGrounded); 
         //add back velocity so that ball can bounce -- and not smack on the ground SS
         ball.velocity = (ball.transform.position - previous) / 10 /* "world scale" is small*/ / Time.deltaTime;
     }
