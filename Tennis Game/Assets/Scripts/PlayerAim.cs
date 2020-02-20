@@ -24,7 +24,7 @@ public class PlayerAim : MonoBehaviour
     {
         //move to clamped bounds
         transform.position = new Vector3(Mathf.Clamp(mousePosition.x, -1, 1),  transform.position.y,
-            Mathf.Clamp(mousePosition.z, 0f, 2f));
+            Mathf.Clamp(mousePosition.z, 1f, 2f));
     }
 
     //https://www.youtube.com/watch?v=RGjojuhuk_s for help with code 

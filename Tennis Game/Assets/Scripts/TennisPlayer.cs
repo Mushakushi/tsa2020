@@ -87,22 +87,24 @@ public class TennisPlayer : MonoBehaviour
             yield return null;
         }
 
-        Debug.LogError("e"); 
-
         //enable gravity 
         ball.useGravity = true;
 
         //Wait Until the ball is grounded, and, then, bounce it 
-        yield return new WaitUntil(() => isBallGrounded); 
+        yield return new WaitUntil(() => isBallGrounded);
         //add back velocity so that ball can bounce -- and not smack on the ground SS
-        ball.velocity = (ball.transform.position - previous) / 10 /* "world scale" is small*/ / Time.deltaTime;
+        Vector3 diff = (ball.position - previous).normalized; 
+        ball.velocity = new Vector3(0,-1 ,1) * diff.x / 5 /* "world scale" is small*/ / Time.deltaTime;
     }
      
 
     private Vector3 GetPointInPath(Vector3 A /*player pos*/, Vector3 point, Vector3 C/*aim pos*/, float t)
     {
+        //move point (point that we are trying to go through) to tennis player's position so that it's no curving wierdly all of the time 
+        point = Vector3.MoveTowards(point, new Vector3(A.x, point.y, point.z), 1);
         //there are infinite solutions for crossing these three points at any value of t, k represents the "best" (more-natural) value of t be the solution 
-        float k = CalculateBestMiddlePoint(A, netPositionTop.position, C);
+        float k = //CalculateBestMiddlePoint(A, netPositionTop.position, C);
+            0.5f; 
         //Re-writing of bezier curve to solve for what B should be so that the bezier curve travels through all three points 
         Vector3 B = (point - (1 - k) * (1 - k) * A - k * k * C) / (2 * (1 - k) * k); 
         //equation of bezier curve: B(t)=(1−t)2P0+2(1−t)tP1+t2P2 where 0<=t<=1 (P0 == point 0, P1 == point 1 ...)
@@ -111,6 +113,7 @@ public class TennisPlayer : MonoBehaviour
 
     private float CalculateBestMiddlePoint(Vector3 A, Vector3 point /*point that we are trying to go through, aka netTopPos*/, Vector3 C)
     {
+        //There is probably a better method, but I run into the problem where the bezier curve goes backwards, so it remain at safe number for now....
         float a = Vector2.Distance(point, A);
         float b = Vector2.Distance(point, C); 
         return a / (a + b);
