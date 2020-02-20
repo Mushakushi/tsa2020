@@ -103,10 +103,14 @@ public class TennisPlayer : MonoBehaviour
         //move point (point that we are trying to go through) to tennis player's position so that it's no curving wierdly all of the time 
         point = Vector3.MoveTowards(point, new Vector3(A.x, point.y, point.z), 1);
         //there are infinite solutions for crossing these three points at any value of t, k represents the "best" (more-natural) value of t be the solution 
-        float k = //CalculateBestMiddlePoint(A, netPositionTop.position, C);
-            0.5f; 
+        float k = CalculateBestMiddlePoint(A, netPositionTop.position, C);
         //Re-writing of bezier curve to solve for what B should be so that the bezier curve travels through all three points 
         Vector3 B = (point - (1 - k) * (1 - k) * A - k * k * C) / (2 * (1 - k) * k); 
+        //to prevent B from creating a bezier curve that extends past A or C
+        if (GameObject.CompareTag("Opponent"))
+            B.z = Mathf.Clamp(B, C.z, A.z); 
+        else 
+            B.z = Mathf.Clamp(B, A.z, C.z); 
         //equation of bezier curve: B(t)=(1−t)2P0+2(1−t)tP1+t2P2 where 0<=t<=1 (P0 == point 0, P1 == point 1 ...)
         return (1f - t) * (1f - t) * A + 2f * (1f - t) * t * B + t * t * C; 
     }
