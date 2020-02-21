@@ -10,7 +10,7 @@ public class Player : TennisPlayer
         targetDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * moveSpeed; 
     }
 
-    protected override void hitBall(Rigidbody ball)
+    protected override void hitBall(GameObject ball)
     {
         //if we succssesfully hit the ball 
         if (Input.GetMouseButton(0))
