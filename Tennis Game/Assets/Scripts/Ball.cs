@@ -9,40 +9,63 @@ public class Ball : MonoBehaviour
     [SerializeField] public Vector3 targetDirection;
 
     [Header("Collision Detection")]
+    public bool isGrounded;
+    [SerializeField] private Vector3 groundPos;
     [SerializeField] private RaycastHit hitInfo;
-    public bool isGrounded; 
-    [SerializeField] private Vector3 groundPos; 
-    [SerializeField] private ContactFilter contactFilter; 
+    [SerializeField] private float distance;
+    [SerializeField] private float shellRadius; 
 
-    [Header("Custom Physics")]
+    [Header("Gravity")]
+    public bool applyGravity = true; 
     [SerializeField] private float gravityModifier; 
 
     private void Start()
     {
+        applyGravity = true; 
         rb = gameObject.GetComponent<Rigidbody>(); 
     }
 
     private void Update()
     { 
-        if (targetDirection.magnitude > 0f)
-        {
-            Physics.Raycast(transform.position, Vector3.down, out hitInfo, 0.1f) && hitInfo.collider.gameObject.CompareTag("Court Floor");
-            ground
-        }
+        
     }
 
     private void FixedUpdate()
     {
-        //if not grounded, apply gravity 
-        if (!isGrounded)
-        {
-            targetDirection += gravityModifier * Physics.gravity;
-        }
-        else
-            targetDirection.y = 0f; 
+        isGrounded = false;
+        if (applyGravity) targetDirection += gravityModifier * Physics.gravity;
 
-        //MovePosition is for kinematic Rigidbodies
-        rb.position += targetDirection * Time.fixedDeltaTime; 
+        if (targetDirection.magnitude > 0f)
+        {
+            Physics.Raycast(transform.position, Vector3.down, out hitInfo, distance);
+            if (hitInfo.collider != null && hitInfo.collider.gameObject.CompareTag("Court Floor"))
+            {
+                groundPos = hitInfo.point + Vector3.up * shellRadius;
+                isGrounded = true;
+            }
+        }
+
+        bool isBelowGround = rb.position.y < groundPos.y;
+        targetDirection.y = isBelowGround ? 0f : targetDirection.y;
+
+        rb.position += targetDirection * Time.fixedDeltaTime;
+        rb.position = isBelowGround ? new Vector3(rb.position.x, groundPos.y, rb.position.z) : rb.position; 
+    }
+
+    public Vector3 GetMovement(bool isMoving)
+    {
+        Vector3 targetDirection = Vector3.zero;
+        if (isMoving)
+        {
+
+        }
+        return targetDirection; 
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(transform.position, transform.position - new Vector3(0, distance, 0)); 
     }
 
     //https://learn.unity.com/tutorial/live-session-2d-platformer-character-controller#5c7f8528edbc2a002053b695

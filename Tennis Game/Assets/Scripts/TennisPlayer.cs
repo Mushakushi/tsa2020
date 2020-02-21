@@ -76,7 +76,8 @@ public class TennisPlayer : MonoBehaviour
     //Function to move the ball, wil be called in child classes, as hitting the ball works the same way, just defined differently based on hitBall()
     protected IEnumerator MoveBall(GameObject ball)
     {
-
+        //Don't let ball fall
+        ballScript.applyGravity = false; 
         //Store previous position so that we can make a velocity calculation once the coroutine is finished 
         Vector3 previous = Vector3.zero; 
         //moves ball along bezier curve across multiple frames 
@@ -93,6 +94,8 @@ public class TennisPlayer : MonoBehaviour
             yield return null;
         }
 
+        //Make ball fall
+        ballScript.applyGravity = true; 
         //Wait Until the ball is grounded, and, then, bounce it 
         yield return new WaitUntil(() => ballScript.isGrounded);
         //add back velocity so that ball can bounce -- and not smack on the ground 
