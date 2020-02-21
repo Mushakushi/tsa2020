@@ -11,6 +11,8 @@ public class Ball : MonoBehaviour
     [Header("Collision Detection")]
     [SerializeField] private RaycastHit hitInfo;
     public bool isGrounded; 
+    [SerializeField] private Vector3 groundPos; 
+    [SerializeField] private ContactFilter contactFilter; 
 
     [Header("Custom Physics")]
     [SerializeField] private float gravityModifier; 
@@ -24,14 +26,8 @@ public class Ball : MonoBehaviour
     { 
         if (targetDirection.magnitude > 0f)
         {
-            if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, 0.1f) && hitInfo.collider.gameObject.CompareTag("Court Floor"))
-            {
-                isGrounded = true; 
-            }
-            else
-            {
-                isGrounded = false; 
-            }
+            Physics.Raycast(transform.position, Vector3.down, out hitInfo, 0.1f) && hitInfo.collider.gameObject.CompareTag("Court Floor");
+            ground
         }
     }
 
