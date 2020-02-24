@@ -16,7 +16,7 @@ public class TennisPlayer : MonoBehaviour
     Ball ballScript;
 
     [Header("Aiming")]
-    [SerializeField] protected GameObject ball; 
+    [SerializeField] protected Rigidbody ball_rb; 
     public static bool isBallGrounded = false; //is the ball grounded?
     [SerializeField] protected Transform aimTarget;
     [SerializeField] protected Transform netPositionTop;
@@ -34,7 +34,7 @@ public class TennisPlayer : MonoBehaviour
         isPlayer = gameObject.CompareTag("Player"); 
         rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
         ballScript = GameObject.FindGameObjectWithTag("Ball").GetComponent<Ball>();
-        ball = GameObject.FindGameObjectWithTag("Ball"); //ball boi
+        ball_rb = GameObject.FindGameObjectWithTag("Ball").GetComponent<Rigidbody>(); //ball boi bod
         netPositionTop = GameObject.FindGameObjectWithTag("Net Top").transform; //top position of the net 
     }
 
@@ -66,40 +66,37 @@ public class TennisPlayer : MonoBehaviour
         if (other.CompareTag("Ball"))
         {
             //Attempt to hitBall(); 
-            hitBall(ball); 
+            hitBall(ball_rb); 
         }
     }
 
     //Child classes will define how the process of hitting the ball works 
-    protected virtual void hitBall(GameObject ball) { }
+    protected virtual void hitBall(Rigidbody ball) { }
     
     //Function to move the ball, wil be called in child classes, as hitting the ball works the same way, just defined differently based on hitBall()
-    protected IEnumerator MoveBall(GameObject ball)
+    protected IEnumerator MoveBall(Rigidbody ball_rb)
     {
         //Don't let ball fall
-        ballScript.applyGravity = false; 
+        ballScript.isMoving = true; 
         //Store previous position so that we can make a velocity calculation once the coroutine is finished 
         Vector3 previous = Vector3.zero; 
         //moves ball along bezier curve across multiple frames 
         //move the ball
         for (float i = 0f; i <= 1f; i += step)
         {
-            previous = ball.transform.position; //set previous transform
+            previous = ball_rb.position; //set previous transform
             //modified version of net top position so that it aligns with player at midpoint between A and C so it's not curving wierdly 
             float mid = (transform.position + aimTarget.position).x / 2;
-            Vector3 point = Vector3.zero;
-            point = Vector3.MoveTowards(point, new Vector3(mid, point.y, point.z), 1);
+            Vector3 point = netPositionTop.position;
+            point = new Vector3(mid, point.y, point.z); 
             //where the acutal movement comes from (kind of)
-            ballScript.targetDirection = GetPointInPath(transform.position, point, aimTarget.position, i + step); 
+            ball_rb.position = GetPointInPath(transform.position, point, aimTarget.position, i + step); 
             yield return null;
         }
 
-        //Make ball fall
-        ballScript.applyGravity = true; 
-        //Wait Until the ball is grounded, and, then, bounce it 
-        yield return new WaitUntil(() => ballScript.isGrounded);
+        ballScript.isMoving = false; 
         //add back velocity so that ball can bounce -- and not smack on the ground 
-        //ball.velocity = (ball.position - previous).normalized + new Vector3(0,0.5f,0.1f) /*add some force*/ / 10 /* "world scale" is small*/ / Time.fixedDeltaTime;
+        ballScript.velocity = new Vector3(ball_rb.position.x - previous.x, ballScript.bounceHieghtMultiplier, ballScript.bounceDistanceMultiplier);
     }
      
 

@@ -8,10 +8,10 @@ public class Opponent : TennisPlayer
     protected override void ComputeDirection()
     {
         //Follow ball on the x @ certain speed 
-        targetDirection = new Vector3((ball.transform.position - transform.position).x, 0f, 0f); 
+        targetDirection = new Vector3((ball_rb.position - transform.position).x, 0f, 0f); 
     }
 
-    protected override void hitBall(GameObject ball)
+    protected override void hitBall(Rigidbody ball)
     {
         //hit the ball 
         StartCoroutine(MoveBall(ball)); 
