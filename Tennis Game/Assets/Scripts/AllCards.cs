@@ -7,12 +7,12 @@ using UnityEngine;
 public delegate Vector3[] Path(Vector3 A, Vector3 point, Vector3 C, int size, bool isPlayer); //path that the ball will follow
 public class Card
 {
-    Path path;
-    float speedMultiplier; //how fast will the ball be hit?
-    float coolDown; //how long it takes until this card can be used again
+    public Path path;
+    public float speedMultiplier; //how fast will the ball be hit?
+    public float coolDown; //how long it takes until this card can be used again
 
     //Constructor for the card
-    public RallyCard(Path pathToFollow, float SpeedMultiplier, float CoolDown)
+    public Card(Path pathToFollow, float SpeedMultiplier, float CoolDown)
     {
         path = pathToFollow;
         speedMultiplier = SpeedMultiplier;

@@ -93,12 +93,13 @@ public class TennisPlayer : MonoBehaviour
         float mid = (transform.position + aimTarget.position).x / 2;
         Vector3 point = netPositionTop.position;
         point = new Vector3(mid, point.y, point.z); 
-        
-        for (float i = 0f; i <= 1f; i += step)
+        //get points 
+        Vector3[] path = card.path(transform.position, point, aimTarget.position, 10, isPlayer);
+        for (int i = 0; i <= 100; i += 1)
         {
             previous = ball_rb.position; //set previous transform
             //where the acutal movement comes from (kind of)
-            ball_rb.position = card.path(transform.position, point, aimTarget.position); 
+            ball_rb.position = path[i]; 
             yield return null;
         }
 
@@ -107,7 +108,7 @@ public class TennisPlayer : MonoBehaviour
         ballScript.velocity = new Vector3(ball_rb.position.x - previous.x, ballScript.bounceHieghtMultiplier, ballScript.bounceDistanceMultiplier);
     }
 
-    private void OnDrawGizmos()
+    /*private void OnDrawGizmos()
     {
         //distinguishes from player and ai aim
         if (isPlayer)
@@ -121,5 +122,5 @@ public class TennisPlayer : MonoBehaviour
                 GetPointInPath(transform.position, netPositionTop.position, aimTarget.position, i + step)); 
         }
         
-    }
+    }*/
 }
