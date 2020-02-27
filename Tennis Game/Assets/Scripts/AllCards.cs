@@ -2,24 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//CARD INTERFACE (so that I can make a deck out of heterogenous classes)
-public interface ICard
-{
-    
-}
-
-
-//ATTACK CARDS HELP HIT THE BALL
+//RALLY CARDS HELP RALLY THE BALL (attack/defense/stat buff)
 [System.Serializable]
 public delegate Vector3[] Path(Vector3 A, Vector3 point, Vector3 C, int size, bool isPlayer); //path that the ball will follow
-public class AttackCard : ICard
+public class Card
 {
     Path path;
     float speedMultiplier; //how fast will the ball be hit?
     float coolDown; //how long it takes until this card can be used again
 
     //Constructor for the card
-    public AttackCard(Path pathToFollow, float SpeedMultiplier, float CoolDown)
+    public RallyCard(Path pathToFollow, float SpeedMultiplier, float CoolDown)
     {
         path = pathToFollow;
         speedMultiplier = SpeedMultiplier;
@@ -63,23 +56,9 @@ public class Paths
 }
 #endregion
 
-//PASSIVE CARDS FOCUS ON STAT BUFFS OR DEBUFFS
-[System.Serializable]
-public class PassiveCard : ICard
-{
-
-}
-
-//DEFENSE CARDS HELP RECIEVE THE BALL
-[System.Serializable]
-public class DefenseCard : ICard
-{
-
-}
-
 //All Cards available in the game 
 public class AllCards : MonoBehaviour
 {
     //Basic Attacking card
-    public AttackCard normal_a = new AttackCard(Paths.NormalBezier, 1f, 0f); 
+    public Card normal_a = new Card(Paths.NormalBezier, 1f, 0f); 
 }
