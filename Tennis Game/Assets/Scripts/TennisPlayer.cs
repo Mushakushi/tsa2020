@@ -10,7 +10,7 @@ public class TennisPlayer : MonoBehaviour
 
     [Header("Deck")]
     [SerializeField] protected AllCards allCardsScript; 
-    [SerializeField] protected List<ICard> deck = new List<ICard>(6); //list of cards (deck) tennis player uses to play
+    [SerializeField] protected List<Card> deck = new List<Card>(6); //list of cards (deck) tennis player uses to play
 
     [Header("Stats")]
     [SerializeField] protected float hitForce;
@@ -81,7 +81,7 @@ public class TennisPlayer : MonoBehaviour
     protected virtual void hitBall(Rigidbody ball) { }
     
     //Function to move the ball, wil be called in child classes, as hitting the ball works the same way, just defined differently based on hitBall()
-    protected IEnumerator MoveBall(Rigidbody ball_rb, ICard card)
+    protected IEnumerator MoveBall(Rigidbody ball_rb, Card card)
     {
         //Don't let ball fall
         ballScript.isMoving = true; 
