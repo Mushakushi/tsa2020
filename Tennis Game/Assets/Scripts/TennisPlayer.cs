@@ -6,7 +6,11 @@ public class TennisPlayer : MonoBehaviour
 {
     //note: player in this script refers to the tennis player, not just the player-player
     [Header("Child Identification")]
-    [SerializeField] protected bool isPlayer; 
+    [SerializeField] protected bool isPlayer;
+
+    [Header("Deck")]
+    [SerializeField] protected AllCards allCardsScript; 
+    [SerializeField] protected List<Card> deck = new List<Card>(6); //list of cards (deck) tennis player uses to play
 
     [Header("Stats")]
     [SerializeField] protected float hitForce;
@@ -35,7 +39,10 @@ public class TennisPlayer : MonoBehaviour
         rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
         ballScript = GameObject.FindGameObjectWithTag("Ball").GetComponent<Ball>();
         ball_rb = GameObject.FindGameObjectWithTag("Ball").GetComponent<Rigidbody>(); //ball boi bod
-        netPositionTop = GameObject.FindGameObjectWithTag("Net Top").transform; //top position of the net 
+        netPositionTop = GameObject.FindGameObjectWithTag("Net Top").transform; //top position of the net
+
+        //TEST
+        deck.Add(allCardsScript.normal_a); 
     }
 
     // Update is called once per frame, but not here ... yet ....
@@ -74,7 +81,7 @@ public class TennisPlayer : MonoBehaviour
     protected virtual void hitBall(Rigidbody ball_rb) { }
     
     //Function to move the ball, wil be called in child classes, as hitting the ball works the same way, just defined differently based on hitBall()
-    protected IEnumerator MoveBall(Rigidbody ball_rb)
+    protected IEnumerator MoveBall(Rigidbody ball_rb, Card card)
     {
         //Don't let ball fall
         ballScript.isMoving = true;
@@ -82,49 +89,22 @@ public class TennisPlayer : MonoBehaviour
         Vector3 previous = Vector3.zero; 
         //moves ball along bezier curve across multiple frames 
         //move the ball
+        //modified version of net top position so that it aligns with player at midpoint between A and C so it's not curving wierdly 
+        float mid = (transform.position + aimTarget.position).x / 2;
+        Vector3 point = netPositionTop.position;
+        point = new Vector3(mid, point.y, point.z); 
+        
         for (float i = 0f; i <= 1f; i += step)
         {
             previous = ball_rb.position; //set previous transform
-            //modified version of net top position so that it aligns with player at midpoint between A and C so it's not curving wierdly 
-            float mid = (transform.position + aimTarget.position).x / 2;
-            Vector3 point = netPositionTop.position;
-            point = new Vector3(mid, point.y, point.z); 
             //where the acutal movement comes from (kind of)
-            ball_rb.position = GetPointInPath(transform.position, point, aimTarget.position, i + step); 
+            ball_rb.position = card.path(transform.position, point, aimTarget.position); 
             yield return null;
         }
 
         ballScript.isMoving = false; 
         //add back velocity so that ball can bounce -- and not smack on the ground 
         ballScript.velocity = new Vector3(ball_rb.position.x - previous.x, ballScript.bounceHieghtMultiplier, ballScript.bounceDistanceMultiplier);
-    }
-     
-
-    private Vector3 GetPointInPath(Vector3 A /*player pos*/, Vector3 point, Vector3 C/*aim pos*/, float t)
-    {
-        
-        //there are infinite solutions for crossing these three points at any value of t, k represents the "best" (more-natural) value of t be the solution 
-        float k = CalculateBestMiddlePoint(A, netPositionTop.position, C);
-        //Re-writing of bezier curve to solve for what B should be so that the bezier curve travels through all three points 
-        Vector3 B = (point - (1 - k) * (1 - k) * A - k * k * C) / (2 * (1 - k) * k);
-        //to prevent B from creating a bezier curve that extends past A or C
-        if (isPlayer)
-            B.z = Mathf.Clamp(B.z, A.z, C.z); //A -> Player -> C
-        else
-            B.z = Mathf.Clamp(B.z, C.z, A.z); //C <- Opponent <- A
-        //equation of bezier curve: B(t)=(1−t)2P0+2(1−t)tP1+t2P2 where 0<=t<=1 (P0 == point 0, P1 == point 1 ...)
-        return (1f - t) * (1f - t) * A + 2f * (1f - t) * t * B + t * t * C; 
-    }
-
-    private float CalculateBestMiddlePoint(Vector3 A, Vector3 point /*point that we are trying to go through, aka netTopPos*/, Vector3 C)
-    {
-        //There is probably a better method, but I run into the problem where the bezier curve goes backwards, so it remain at safe number for now....
-        float a = Vector2.Distance(point, A);
-        float b = Vector2.Distance(point, C); 
-        return a / (a + b);
-
-        //thanks to @Bunny83 and @SparrowsNest for all their help! 
-        //https://answers.unity.com/questions/1700903/how-to-make-quadratic-bezier-curve-through-3-point.html?_ga=2.167879905.1985838484.1581976785-1145140738.1537626484
     }
 
     private void OnDrawGizmos()
