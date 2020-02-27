@@ -89,15 +89,16 @@ public class TennisPlayer : MonoBehaviour
         Vector3 previous = Vector3.zero; 
         //moves ball along bezier curve across multiple frames 
         //move the ball
+        //modified version of net top position so that it aligns with player at midpoint between A and C so it's not curving wierdly 
+        float mid = (transform.position + aimTarget.position).x / 2;
+        Vector3 point = netPositionTop.position;
+        point = new Vector3(mid, point.y, point.z); 
+        
         for (float i = 0f; i <= 1f; i += step)
         {
             previous = ball_rb.position; //set previous transform
-            //modified version of net top position so that it aligns with player at midpoint between A and C so it's not curving wierdly 
-            float mid = (transform.position + aimTarget.position).x / 2;
-            Vector3 point = netPositionTop.position;
-            point = new Vector3(mid, point.y, point.z); 
             //where the acutal movement comes from (kind of)
-            ball_rb.position = card.
+            ball_rb.position = card.path(transform.position, point, aimTarget.position); 
             yield return null;
         }
 
