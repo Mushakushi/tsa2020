@@ -71,13 +71,13 @@ public class TennisPlayer : MonoBehaviour
     }
 
     //Child classes will define how the process of hitting the ball works 
-    protected virtual void hitBall(Rigidbody ball) { }
+    protected virtual void hitBall(Rigidbody ball_rb) { }
     
     //Function to move the ball, wil be called in child classes, as hitting the ball works the same way, just defined differently based on hitBall()
     protected IEnumerator MoveBall(Rigidbody ball_rb)
     {
         //Don't let ball fall
-        ballScript.isMoving = true; 
+        ballScript.isMoving = true;
         //Store previous position so that we can make a velocity calculation once the coroutine is finished 
         Vector3 previous = Vector3.zero; 
         //moves ball along bezier curve across multiple frames 

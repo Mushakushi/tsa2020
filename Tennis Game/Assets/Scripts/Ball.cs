@@ -36,6 +36,10 @@ public class Ball : MonoBehaviour
         isGrounded = false;
         //if we not being slapped by a racket fall; if we're being hit, freeze (the computations...)!
         velocity = !isMoving ? velocity /*are we bouncing?*/ + gravityModifier * Physics.gravity : Vector3.zero;
+        if (!isMoving)
+        {
+            velocity += gravityModifier * Physics.gravity; 
+        }
         //crude way of falling back down after bounce velocity is done affecting us 
         
         //if we're falling naturally, do some calculations to get us falling and colliding 
