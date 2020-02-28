@@ -4,7 +4,7 @@ using UnityEngine;
 
 //RALLY CARDS HELP RALLY THE BALL (attack/defense/stat buff)
 [System.Serializable]
-public delegate Vector3[] Path(Vector3 A, Vector3 point, Vector3 C, int size, bool isPlayer); //path that the ball will follow
+public delegate Vector3[] Path(Vector3 A, Vector3 point, Vector3 C, bool isPlayer); //path that the ball will follow
 public class Card
 {
     public Path path;
@@ -23,10 +23,13 @@ public class Card
 #region PATHS
 public class Paths
 {
+
+    public const int capacity = 100; 
+
     //BEZIER CURVE
-    public static Vector3[] NormalBezier(Vector3 A, Vector3 point, Vector3 C, int size, bool isPlayer)
+    public static Vector3[] NormalBezier(Vector3 A, Vector3 point, Vector3 C, bool isPlayer)
     {
-        Vector3[] points = new Vector3[size];
+        Vector3[] points = new Vector3[capacity];
         //CALCULATE POINT (VALUE OF T) TO CROSS POINT
         float a = Vector2.Distance(point, A);
         float b = Vector2.Distance(point, C);
@@ -41,7 +44,7 @@ public class Paths
         else
             B.z = Mathf.Clamp(B.z, C.z, A.z); //C <- Opponent <- A
 
-        for (int t = 0; t == size; t++)
+        for (int t = 0; t <= capacity - 1; t++)
         {
             //GET POINTS AND ADD THE TO THE ARRAY
             points[t] = (1f - t) * (1f - t) * A + 2f * (1f - t) * t * B + t * t * C; 
