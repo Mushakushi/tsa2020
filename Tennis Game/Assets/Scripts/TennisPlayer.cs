@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class TennisPlayer : MonoBehaviour
 {
-    public GameObject b;
 
     //note: player in this script refers to the tennis player, not just the player-player
     [Header("Child Identification")]
     [SerializeField] protected bool isPlayer;
 
     [Header("Deck")]
-    [SerializeField] protected AllCards allCardsScript; 
-    [SerializeField] protected List<Card> deck = new List<Card>(6); //list of cards (deck) tennis player uses to play
+    [SerializeField] protected AllCards allCardsScript;
+    [SerializeField] protected Card[] deck; //list of cards (deck) tennis player uses to play
 
     [Header("Stats")]
     [SerializeField] protected float hitForce;
@@ -21,11 +20,12 @@ public class TennisPlayer : MonoBehaviour
     [Header("Ball")]
     [SerializeField] Ball ballScript;
 
-    [Header("Aiming")]
+    [Header("Ball Hitting")]
     [SerializeField] protected Rigidbody ball_rb; 
     [SerializeField] protected Transform aimTarget;
     [SerializeField] protected Transform netPositionTop;
-    [SerializeField] protected float step = 0.1f; //how to much to increment over bezier curve path 
+    [SerializeField] protected Vector3[] path; 
+    [SerializeField] protected int capacity = 25; //how to much increments over bezier curve path 
 
     [Header("Movement")]
     [SerializeField] protected Vector3 targetDirection; 
@@ -39,6 +39,7 @@ public class TennisPlayer : MonoBehaviour
         isPlayer = gameObject.CompareTag("Player"); 
         rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
 
+        deck = new Card[6]; 
         allCardsScript = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<AllCards>(); 
 
         ballScript = GameObject.FindGameObjectWithTag("Ball").GetComponent<Ball>();
@@ -47,8 +48,10 @@ public class TennisPlayer : MonoBehaviour
 
         netPositionTop = GameObject.FindGameObjectWithTag("Net Top").transform; //top position of the net
 
+        path = new Vector3[capacity]; //set the capacity (samples) of path graph
+
         //TEST
-        deck.Add(allCardsScript.normal_a);
+        deck[0] = allCardsScript.normal_a;
     }
 
     // Update is called once per frame, but not here ... yet ....
@@ -101,12 +104,12 @@ public class TennisPlayer : MonoBehaviour
         Vector3 point = netPositionTop.position;
         point = new Vector3(mid, point.y, point.z);
         //get points 
-        Vector3[] path = card.path(transform.position, point, aimTarget.position, isPlayer);
-        for (int i = 0; i < 100; i += 1)
+        path = card.path(transform.position, point, aimTarget.position, capacity, isPlayer);
+        for (int i = 0; i <= capacity - 1; i++)
         {
             previous = ball_rb.position; //set previous transform
             //where the acutal movement comes from (kind of)
-            ball_rb.position = path[i]; 
+            ball_rb.position = Vector3.Lerp(transform.position, path[i], card.speedMultiplier); 
             yield return null;
         }
 
@@ -127,16 +130,14 @@ public class TennisPlayer : MonoBehaviour
         Vector3 point = netPositionTop.position;
         point = new Vector3(mid, point.y, point.z);
 
-        /*
-        print(point);
-        b.transform.position = point;
-
-        Vector3[] path = deck[0].path(transform.position, point, aimTarget.position, isPlayer);
-
-        for (int i = 0; i < Paths.capacity - 2; i++)
+        if (deck != null)
         {
-            Debug.DrawLine(path[i], path[i + 1]); 
-        }*/
-        
+            path = deck[0].path(transform.position, point, aimTarget.position, capacity, isPlayer);
+
+            for (int i = 0; i <= capacity - 2; i++)
+            {
+                Debug.DrawLine(path[i], path[i + 1/*we are adding one at the end, so we're stopping two early*/]);
+            }
+        }
     }
 }

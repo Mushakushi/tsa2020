@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //RALLY CARDS HELP RALLY THE BALL (attack/defense/stat buff)
-[System.Serializable]
-public delegate Vector3[] Path(Vector3 A, Vector3 point, Vector3 C, bool isPlayer); //path that the ball will follow
+public delegate Vector3[] Path(Vector3 A, Vector3 point, Vector3 C, int capacity, bool isPlayer); //path that the ball will follow
 public class Card
 {
     public Path path;
@@ -24,10 +23,8 @@ public class Card
 public class Paths
 {
 
-    public const int capacity = 100; 
-
     //BEZIER CURVE
-    public static Vector3[] NormalBezier(Vector3 A, Vector3 point, Vector3 C, bool isPlayer)
+    public static Vector3[] NormalBezier(Vector3 A, Vector3 point, Vector3 C, int capacity /*amount of points*/, bool isPlayer)
     {
         Vector3[] points = new Vector3[capacity];
         //CALCULATE POINT (VALUE OF T) TO CROSS POINT
@@ -44,10 +41,14 @@ public class Paths
         else
             B.z = Mathf.Clamp(B.z, C.z, A.z); //C <- Opponent <- A
 
-        for (int t = 0; t <= capacity - 1; t++)
+        //CALCULATE GRAPH
+        for (int i = 0; i <= capacity - 1; i++)
         {
+            //GET VALUE OF T 
+            float t = 1f / capacity * i;
+
             //GET POINTS AND ADD THE TO THE ARRAY
-            points[t] = (1f - t) * (1f - t) * A + 2f * (1f - t) * t * B + t * t * C; 
+            points[i] = (1f - t) * (1f - t) * A + 2f * (1f - t) * t * B + t * t * C;
 
             //thanks to @Bunny83 and @SparrowsNest for all their help! 
             //https://answers.unity.com/questions/1700903/how-to-make-quadratic-bezier-curve-through-3-point.html?_ga=2.167879905.1985838484.1581976785-1145140738.1537626484
