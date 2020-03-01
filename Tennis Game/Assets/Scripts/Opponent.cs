@@ -7,13 +7,15 @@ public class Opponent : TennisPlayer
 
     protected override void ComputeDirection()
     {
-        //Follow ball on the x @ certain speed 
-        targetDirection = new Vector3((ball_rb.position - transform.position).x, 0f, 0f); 
+        //Follow ball @ certain speed 
+        Vector3 move = Vector3.MoveTowards(transform.position, ball_rb.position - transform.position, moveSpeed);
+        move.y = 0f; 
+        targetDirection = move; 
     }
 
     protected override void hitBall(Rigidbody ball)
     {
         //hit the ball 
-        StartCoroutine(MoveBall(ball, deck[0])); 
+        StartCoroutine(MoveBall(ball_rb)); 
     }
 }

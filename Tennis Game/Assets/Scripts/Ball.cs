@@ -30,6 +30,14 @@ public class Ball : MonoBehaviour
         rb = gameObject.GetComponent<Rigidbody>();
     }
 
+    private void Update()
+    {
+        if(transform.position.y < 0f)
+        {
+            transform.position = Vector3.up; 
+        }
+    }
+
     private void FixedUpdate()
     {
         //grounded is false until proven otherwise 

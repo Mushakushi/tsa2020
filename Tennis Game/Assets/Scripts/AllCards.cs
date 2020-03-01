@@ -4,18 +4,25 @@ using UnityEngine;
 
 //RALLY CARDS HELP RALLY THE BALL (attack/defense/stat buff)
 public delegate Vector3[] Path(Vector3 A, Vector3 point, Vector3 C, int capacity, bool isPlayer); //path that the ball will follow
+public delegate void Effect(TennisPlayer player); //misc effect of card
 public class Card
 {
-    public Path path;
+    public Path path; //path the ball will hit
     public float speedMultiplier; //how fast will the ball be hit?
-    public float coolDown; //how long it takes until this card can be used again
+    public Effect effect; //mis effect that ball wil have (if applicable)
+    public int waitTime = 0; //how long have we waited for activation after cooldown? Cards reactivate once we have waited for cooldown 
+    public int coolDown; //how long it takes until this card can be used again
+
+    public Color color; //color of line made by this card 
 
     //Constructor for the card
-    public Card(Path pathToFollow, float SpeedMultiplier, float CoolDown)
+    public Card(Path pathToFollow, float SpeedMultiplier, Effect miscEffect, int CoolDown, Color lineColor)
     {
         path = pathToFollow;
         speedMultiplier = SpeedMultiplier;
-        coolDown = CoolDown; 
+        effect = miscEffect; 
+        coolDown = CoolDown;
+        color = lineColor; 
     }
 }
 
@@ -57,12 +64,37 @@ public class Paths
         //RETURN PATHS
         return points; 
     }
+
+    //LINEAR
+    public static Vector3[] Linear(Vector3 A, Vector3 point, Vector3 C, int capacity, bool isPlayer)
+    {
+        Vector3[] points = new Vector3[capacity];
+
+        //Go straight from point A to B
+        for (int i = 0; i < capacity; i++)
+        {
+            points[i] = Vector3.Lerp(A, C, 1f / capacity * i); 
+        }
+
+        return points; 
+    }
+}
+#endregion
+
+#region EFFECTS
+class Effects : MonoBehaviour
+{
+    public static void Jump(TennisPlayer player)
+    {
+        player.targetDirection.y += 2; 
+    }
 }
 #endregion
 
 //All Cards available in the game 
 public class AllCards : MonoBehaviour
 {
-    //Basic Attacking card
-    public Card normal_a = new Card(Paths.NormalBezier, 1f, 0f); 
+    //Attacking
+    public Card normal_a = new Card(Paths.NormalBezier, 1f, null, 0, Color.blue);
+    public Card jumpShot_a = new Card(Paths.Linear, 2f, Effects.Jump, 1, Color.red); 
 }

@@ -14,6 +14,6 @@ public class Player : TennisPlayer
     {
         //if we succssesfully hit the ball 
         if (Input.GetMouseButton(0))
-            StartCoroutine(MoveBall(ball_rb, deck[0])); 
+            StartCoroutine(MoveBall(ball_rb)); 
     }
 }
