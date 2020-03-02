@@ -128,7 +128,7 @@ public class TennisPlayer : MonoBehaviour
         }
 
         //Cycle to the next card 
-        currentCardIndex = CycleDeck(currentCardIndex); 
+        CycleDeck(out currentCardIndex); 
 
         ballScript.isMoving = false;
         //add back velocity so that ball can bounce -- and not smack on the ground 
@@ -139,7 +139,7 @@ public class TennisPlayer : MonoBehaviour
     }
 
     //Cycle through the deck 
-    public int CycleDeck(int currentIndex)
+    public CycleDeck(out int currentIndex)
     {
         //CURRENT CARD
         print("Cycling deck");
@@ -174,7 +174,7 @@ public class TennisPlayer : MonoBehaviour
 
         //Return that card 
         print(targetIndex); 
-        return targetIndex; 
+        currentIndex = targetIndex; 
     }
     
     public void MoveToNextCard(out int index, out Card target)
