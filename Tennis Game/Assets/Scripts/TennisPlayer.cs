@@ -181,26 +181,4 @@ public class TennisPlayer : MonoBehaviour
         return targetIndex; 
     }
 
-    private void OnDrawGizmos()
-    {
-        //distinguishes from player and ai aim
-        if (isPlayer)
-            Gizmos.color = Color.blue;
-        else
-            Gizmos.color = Color.red;
-
-        float mid = (transform.position + aimTarget.position).x / 2;
-        Vector3 point = netPositionTop.position;
-        point = new Vector3(mid, point.y, point.z);
-
-        if (deck != null)
-        {
-            path = deck[currentCardIndex].path(transform.position, point, aimTarget.position, capacity, isPlayer);
-
-            for (int i = 0; i <= capacity - 2; i++)
-            {
-                Debug.DrawLine(path[i], path[i + 1/*we are adding one at the end, so we're stopping two early*/]);
-            }
-        }
-    }
 }
