@@ -141,37 +141,33 @@ public class TennisPlayer : MonoBehaviour
     //Cycle through the deck 
     public int CycleDeck(int currentIndex)
     {
+        //CURRENT CARD
         print("Cycling deck");
         //if the card that was just used has a cooldown, reset it's timer 
         if (deck[currentIndex].coolDown > 0)
             deck[currentIndex].waitTime = 0; 
-
-        //target index of card / move to the next card in the list 
-        int targetIndex = currentIndex + 1;
-        //go back to start of deck if over the max 
-        if (targetIndex > deck.Length - 1)
-            targetIndex = 0;
-        //target card based on target index
-        Card target = deck[targetIndex]; 
+        Debug.LogFormat("Card has been deactivated {0}", target); 
         
-        //If the card has cooldown
-        if (target.coolDown > 0)
+        //NEW CARD
+        //move to the next card in the list and get target card based on index
+        int targetIndex = currentIndex;
+        Card target; 
+        MoveToNextCard(out targetIndex, out target); 
+        
+        //If the card has cooldown and is inactive
+        if (target.coolDown > 0 && target.waitTime != target.coolDown)
         {
-            Debug.LogFormat("Card has been deactivated {0}", target); 
-
-            //increase wait time if the card has been deativated 
-            if (target.waitTime < target.coolDown)
-                target.waitTime++;
-
-            //while the current card's waitime is less than its cooldown (are we still waiting?)
-            while (target.waitTime < target.coolDown)
+            //while the current card's waitime is less than its cooldown (are we still waiting for card to recharge?
+            while (target.waitTime < target.coolDown && (target.coolDown > 0 && target.waitTime != target.coolDown))
             {
-                //go to the next card 
-                targetIndex++;
-                if (targetIndex > deck.Length)
-                    targetIndex = 0;
-                //update current card 
-                target = deck[targetIndex]; 
+                //Increase wait time (REMEBER: when waitTime is how long we are waiting until Cool-downed)
+                target.waitTime++; 
+                //If card's waittime == cooldown (card is recharged) recharge it!
+                if (target.waitTime == target.coolDown)
+                    target.waiTime = 0; 
+                //move to the next card 
+                MoveToNextCard(out targetIndex, out target);
+                //cyle repeats to find a cooldowned card....
             }
         }
         //we now have a card that is cool-downed
@@ -179,6 +175,17 @@ public class TennisPlayer : MonoBehaviour
         //Return that card 
         print(targetIndex); 
         return targetIndex; 
+    }
+    
+    public void MoveToNextCard(out int index, out Card target)
+    {
+        //move the the next card 
+        index++; 
+        //if outside of bounds, loop back to beginning
+        if (index > deck.Length - 1)
+            index = 0; 
+        //target Card based on the set index
+        target = deck[index]
     }
 
 }
