@@ -11,7 +11,7 @@ public class TennisPlayer : MonoBehaviour
 
     [Header("Deck")]
     [SerializeField] protected AllCards allCardsScript;
-    [SerializeField] protected Card[] deck; //list of cards (deck) tennis player uses to play
+    [SerializeField] protected Card[] deck = new Card[6]; //list of cards (deck) tennis player uses to play
     [SerializeField] protected int currentCardIndex; 
 
     [Header("Stats")]
@@ -40,7 +40,11 @@ public class TennisPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        isPlayer = gameObject.CompareTag("Player");
+        rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
+
         //TEST
+        allCardsScript = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<AllCards>();
         deck[0] = allCardsScript.normal_a;
         deck[1] = allCardsScript.jumpShot_a;
         deck[2] = allCardsScript.normal_a;
@@ -48,12 +52,11 @@ public class TennisPlayer : MonoBehaviour
         deck[4] = allCardsScript.normal_a;
         deck[5] = allCardsScript.jumpShot_a;
 
-        isPlayer = gameObject.CompareTag("Player"); 
-        rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
-
-        deck = new Card[6]; 
-        allCardsScript = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<AllCards>(); 
-
+        //if is player, set up UI for deck 
+        if (isPlayer)
+            SetUpDeckUI(); 
+        
+        //get the ball 
         ballScript = GameObject.FindGameObjectWithTag("Ball").GetComponent<Ball>();
         ball_rb = GameObject.FindGameObjectWithTag("Ball").GetComponent<Rigidbody>(); //ball boi bod
 
@@ -67,6 +70,11 @@ public class TennisPlayer : MonoBehaviour
 
         
     }
+
+    //Set up the deck UI (only for player)
+    protected virtual void SetUpDeckUI() { }
+    //Update the deck UI (only for player)
+    protected virtual void UpdateDeckUI(int targetIndex) { }
 
     // Update is called once per frame
     void Update()
@@ -155,20 +163,18 @@ public class TennisPlayer : MonoBehaviour
         //NEW CARD
         //move to the next card in the list and get target card based on index
         int targetIndex = currentIndex;
-        Card target = null; 
+        Card target = deck[currentIndex]; 
         MoveToNextCard(ref targetIndex, ref target); 
         
         //If the card has cooldown and is inactive
         if (target.coolDown > 0 && target.waitTime != target.coolDown)
         {
             //while the current card's waitime is less than its cooldown (are we still waiting for card to recharge?
-            while (target.waitTime < target.coolDown && (target.coolDown > 0 && target.waitTime != target.coolDown))
+            while (target.waitTime < target.coolDown /*waiting for recharge*/ && target.coolDown > 0 /*has a cooldown in the first place*/)
             {
-                //Increase wait time (REMEBER: when waitTime is how long we are waiting until Cool-downed)
+                //Increase wait time (REMEBER: when waitTime increases to equal cooldown time; when we have waited, we have fully cool-downed)
                 target.waitTime++; 
-                //If card's waittime == cooldown (card is recharged) recharge it!
-                if (target.waitTime == target.coolDown)
-                    target.waitTime = 0; 
+
                 //move to the next card 
                 MoveToNextCard(ref targetIndex, ref target);
                 //cyle repeats to find a cooldowned card....
@@ -179,6 +185,9 @@ public class TennisPlayer : MonoBehaviour
         //Return that card 
         print(targetIndex); 
         currentIndex = targetIndex;
+        //Update UI (if you're player, of course!)
+        if (isPlayer)
+            UpdateDeckUI(targetIndex); 
     }
     
     public void MoveToNextCard(ref int index, ref Card target)

@@ -10,7 +10,7 @@ public class Card
     public Path path; //path the ball will hit
     public float speedMultiplier; //how fast will the ball be hit?
     public Effect effect; //mis effect that ball wil have (if applicable)
-    public int waitTime = 0; //how long have we waited for activation after cooldown? Cards reactivate once we have waited for cooldown 
+    public int waitTime; //how long have we waited for activation after cooldown? Cards reactivate once we have waited for cooldown 
     public int coolDown; //how long it takes until this card can be used again
 
     public string name; //name of the card; 
@@ -23,6 +23,7 @@ public class Card
         speedMultiplier = SpeedMultiplier;
         effect = miscEffect; 
         coolDown = CoolDown;
+        waitTime = CoolDown; 
         name = Name; 
         color = lineColor; 
     }
