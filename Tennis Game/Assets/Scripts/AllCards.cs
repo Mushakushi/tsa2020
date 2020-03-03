@@ -13,15 +13,17 @@ public class Card
     public int waitTime = 0; //how long have we waited for activation after cooldown? Cards reactivate once we have waited for cooldown 
     public int coolDown; //how long it takes until this card can be used again
 
+    public string name; //name of the card; 
     public Color color; //color of line made by this card 
 
     //Constructor for the card
-    public Card(Path pathToFollow, float SpeedMultiplier, Effect miscEffect, int CoolDown, Color lineColor)
+    public Card(Path pathToFollow, float SpeedMultiplier, Effect miscEffect, int CoolDown, string Name,  Color lineColor)
     {
         path = pathToFollow;
         speedMultiplier = SpeedMultiplier;
         effect = miscEffect; 
         coolDown = CoolDown;
+        name = Name; 
         color = lineColor; 
     }
 }
@@ -95,6 +97,6 @@ class Effects : MonoBehaviour
 public class AllCards : MonoBehaviour
 {
     //Attacking
-    public Card normal_a = new Card(Paths.NormalBezier, 1f, null, 0, Color.blue);
-    public Card jumpShot_a = new Card(Paths.Linear, 2f, Effects.Jump, 1, Color.red); 
+    public Card normal_a = new Card(Paths.NormalBezier, 1f, null, 0, "Normal",  Color.blue);
+    public Card jumpShot_a = new Card(Paths.Linear, 2f, Effects.Jump, 1, "Jump Shot", Color.red); 
 }

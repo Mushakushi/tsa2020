@@ -8,11 +8,12 @@ public class Ball : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] public bool isMoving; 
     public Vector3 velocity;
+    public Vector3 previousPos; 
 
     [Space]
-    public Vector3 bounceVelocity;
-    public float bounceHieghtMultiplier;
-    public float bounceDistanceMultiplier; 
+    [SerializeField] private float minBounceVelocity; 
+    [SerializeField] private float bounceHieghtMultiplier;
+    [SerializeField] private float bounceDistanceMultiplier;
 
     [Header("Collision Detection")]
     public bool isGrounded;
@@ -34,7 +35,7 @@ public class Ball : MonoBehaviour
     {
         if(transform.position.y < 0f)
         {
-            transform.position = Vector3.up; 
+            rb.position = Vector3.up; 
         }
     }
 
@@ -43,14 +44,13 @@ public class Ball : MonoBehaviour
         //grounded is false until proven otherwise 
         isGrounded = false;
         //if we not being slapped by a racket fall; if we're being hit, freeze (the computations...)!
-        velocity = !isMoving ? velocity /*are we bouncing?*/ + gravityModifier * Physics.gravity : Vector3.zero; 
-        //crude way of falling back down after bounce velocity is done affecting us 
-        
+        velocity = !isMoving ? velocity /*are we bouncing?*/ + gravityModifier * Physics.gravity : Vector3.zero;
+
         //if we're falling naturally, do some calculations to get us falling and colliding 
         if (velocity.magnitude > 0.001f && !isMoving)
         {
             float distance = velocity.magnitude; //length of direction that we are trying to move 
-            Physics.Raycast(transform.position, Vector3.down, out hitInfo, length);
+            Physics.Raycast(rb.position, Vector3.down, out hitInfo, length);
             //if we're hitting the ground 
             if (hitInfo.collider != null && hitInfo.collider.gameObject.CompareTag("Court Floor"))
             {
@@ -61,11 +61,18 @@ public class Ball : MonoBehaviour
                 //distance to the collider 
                 float modifiedDistance = hitInfo.distance - shellRadius;
                 //if we're about to move into a collider adjust our velocity to not hit it 
-                distance = distance > modifiedDistance ? modifiedDistance : distance; 
+                distance = distance > modifiedDistance ? modifiedDistance : distance;
             }
-            
+
+            //if we're grounded, bounce (but not infinitely, once we slow down, let's roll)
+            if (!isMoving && isGrounded && velocity.magnitude > minBounceVelocity)
+            {
+                //add back velocity so that ball can bounce -- and not smack on the ground 
+                velocity = new Vector3(velocity.x, bounceHieghtMultiplier, bounceDistanceMultiplier * velocity.z);
+            }
+
             //if we're not being moved by the tennis racket, then move according to normal gravity and physics bruh 
-            if (!isMoving) rb.position += velocity.normalized /*sheer direction*/ * distance /*"magnitude"*/ * Time.fixedDeltaTime /*smooth*/;
+            rb.position += velocity.normalized /*sheer direction*/ * distance /*"magnitude"*/ * Time.fixedDeltaTime /*smooth*/;
         }
 
         //an adapted version of Unity's kinematic Rigidbody Platfomer Character Controller tutorial 

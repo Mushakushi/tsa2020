@@ -13,9 +13,9 @@ public class Opponent : TennisPlayer
         targetDirection = move; 
     }
 
-    protected override void hitBall(Rigidbody ball)
+    protected override void hitBall(Rigidbody ball, Vector3[] path)
     {
         //hit the ball 
-        StartCoroutine(MoveBall(ball_rb)); 
+        StartCoroutine(MoveBall(ball_rb, path)); 
     }
 }

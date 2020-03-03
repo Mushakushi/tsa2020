@@ -40,6 +40,14 @@ public class TennisPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //TEST
+        deck[0] = allCardsScript.normal_a;
+        deck[1] = allCardsScript.jumpShot_a;
+        deck[2] = allCardsScript.normal_a;
+        deck[3] = allCardsScript.jumpShot_a;
+        deck[4] = allCardsScript.normal_a;
+        deck[5] = allCardsScript.jumpShot_a;
+
         isPlayer = gameObject.CompareTag("Player"); 
         rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
 
@@ -57,19 +65,21 @@ public class TennisPlayer : MonoBehaviour
         lineRenderer = GameObject.Find(isPlayer ? "Player Aim Line" : "Opponent Aim Line").GetComponent<LineRenderer>();
         lineRenderer.positionCount = capacity;
 
-        //TEST
-        deck[0] = allCardsScript.normal_a;
-        deck[1] = allCardsScript.jumpShot_a;
-        deck[2] = allCardsScript.normal_a;
-        deck[3] = allCardsScript.jumpShot_a;
-        deck[4] = allCardsScript.normal_a;
-        deck[5] = allCardsScript.jumpShot_a;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Show Line
+        //UPDATE PATH TO HIT
+        //modified version of net top position so that it aligns with player at midpoint between A and C so it's not curving wierdly 
+        float mid = (transform.position + aimTarget.position).x / 2;
+        Vector3 point = netPositionTop.position;
+        point = Vector3.MoveTowards(point, new Vector3(mid, point.y, point.z), 0.5f);
+        //get points 
+        path = deck[currentCardIndex].path(transform.position, point, aimTarget.position, capacity, isPlayer);
+
+        //RENDER LINE
         lineRenderer.SetPositions(path);
         lineRenderer.startColor = deck[currentCardIndex].color; 
     }
@@ -96,63 +106,57 @@ public class TennisPlayer : MonoBehaviour
         //is this the ball, which we are hitting? 
         if (other.CompareTag("Ball"))
         {
+            //take a snapshot of the current path, so that the ball doesn't update it's flight path when being hit 
+            Vector3[] pathSnapshot = path;
+
             //Attempt to hitBall(); 
-            hitBall(ball_rb); 
+            hitBall(ball_rb, pathSnapshot); 
         }
     }
 
     //Child classes will define how the process of hitting the ball works 
-    protected virtual void hitBall(Rigidbody ball_rb) { }
+    protected virtual void hitBall(Rigidbody ball_rb, Vector3[] path) { }
     
     //Function to move the ball, wil be called in child classes, as hitting the ball works the same way, just defined differently based on hitBall()
-    protected IEnumerator MoveBall(Rigidbody ball_rb)
+    protected IEnumerator MoveBall(Rigidbody ball_rb, Vector3[] path)
     {
         //Don't let ball fall
         ballScript.isMoving = true;
-        //Store previous position so that we can make a velocity calculation once the coroutine is finished 
-        Vector3 previous = Vector3.zero; 
-        //moves ball along bezier curve across multiple frames 
-        //move the ball
-        //modified version of net top position so that it aligns with player at midpoint between A and C so it's not curving wierdly 
-        float mid = (transform.position + aimTarget.position).x / 2;
-        Vector3 point = netPositionTop.position;
-        point = Vector3.MoveTowards(point, new Vector3(mid, point.y, point.z), 0.1f);
-        //get points 
-        path = deck[currentCardIndex].path(transform.position, point, aimTarget.position, capacity, isPlayer);
+
+        //Move the ball 
         for (int i = 0; i <= capacity - 1; i++)
         {
-            previous = ball_rb.position; //set previous transform
+            //store previous postion of ball 
+            ballScript.previousPos = ball_rb.position;
             //where the acutal movement comes from (kind of)
-            ball_rb.position = Vector3.Lerp(transform.position, path[i], deck[currentCardIndex].speedMultiplier); 
+            ball_rb.position = Vector3.Lerp(transform.position, path[i], deck[currentCardIndex].speedMultiplier);
             yield return null;
         }
 
         //Cycle to the next card 
-        CycleDeck(out currentCardIndex); 
+        CycleDeck(ref currentCardIndex);
 
+        //tell the ball that it is no longer moving and give it velocity based on movement 
+        print(ball_rb.position - ballScript.previousPos); 
+        ballScript.velocity = ball_rb.position - ballScript.previousPos; 
         ballScript.isMoving = false;
-        //add back velocity so that ball can bounce -- and not smack on the ground 
-        Vector3 moveDelta = ball_rb.position - previous; 
-        ballScript.velocity = new Vector3(moveDelta.x, ballScript.bounceHieghtMultiplier, ballScript.bounceDistanceMultiplier * (isPlayer ? 1 : -1) /*forward or backwards?*/);
-
-        
     }
 
     //Cycle through the deck 
-    public CycleDeck(out int currentIndex)
+    public void CycleDeck(ref int currentIndex)
     {
         //CURRENT CARD
         print("Cycling deck");
         //if the card that was just used has a cooldown, reset it's timer 
         if (deck[currentIndex].coolDown > 0)
             deck[currentIndex].waitTime = 0; 
-        Debug.LogFormat("Card has been deactivated {0}", target); 
+        Debug.LogFormat("Card has been deactivated {0}", deck[currentIndex]); 
         
         //NEW CARD
         //move to the next card in the list and get target card based on index
         int targetIndex = currentIndex;
-        Card target; 
-        MoveToNextCard(out targetIndex, out target); 
+        Card target = null; 
+        MoveToNextCard(ref targetIndex, ref target); 
         
         //If the card has cooldown and is inactive
         if (target.coolDown > 0 && target.waitTime != target.coolDown)
@@ -164,9 +168,9 @@ public class TennisPlayer : MonoBehaviour
                 target.waitTime++; 
                 //If card's waittime == cooldown (card is recharged) recharge it!
                 if (target.waitTime == target.coolDown)
-                    target.waiTime = 0; 
+                    target.waitTime = 0; 
                 //move to the next card 
-                MoveToNextCard(out targetIndex, out target);
+                MoveToNextCard(ref targetIndex, ref target);
                 //cyle repeats to find a cooldowned card....
             }
         }
@@ -174,18 +178,18 @@ public class TennisPlayer : MonoBehaviour
 
         //Return that card 
         print(targetIndex); 
-        currentIndex = targetIndex; 
+        currentIndex = targetIndex;
     }
     
-    public void MoveToNextCard(out int index, out Card target)
+    public void MoveToNextCard(ref int index, ref Card target)
     {
         //move the the next card 
         index++; 
         //if outside of bounds, loop back to beginning
         if (index > deck.Length - 1)
-            index = 0; 
+            index = 0;
         //target Card based on the set index
-        target = deck[index]
+        target = deck[index]; 
     }
 
 }
