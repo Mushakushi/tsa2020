@@ -57,13 +57,13 @@ public class Player : TennisPlayer
             //get rectTransform of Image componenet
             RectTransform cardTransform = deckUI[index].transform.GetChild(0).GetComponent<RectTransform>();
             //Move deck around 
-            cardTransform.anchoredPosition = Vector2.Lerp(transform.position, new Vector2((i * 100) -150, -i * 10), 0.5f);
+            StartCoroutine(MoveCard(ref cardTransform.anchoredPosition, targetIndex));
 
         }
     }
     
     //Cards do not have an Update loop to lerp continuously, thus the use of a couroutine
-    private IEnumerator MoveCardUI(ref RectTransform card, int i)
+    private IEnumerator MoveCardUI(ref Vector2 card, int i)
     {
         card.anchoredPosition = Vector2.Lerp(transform.position, new Vector2((i * 100) -150, -i * 10), moveStep);
         yield return null; 
