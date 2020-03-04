@@ -28,7 +28,7 @@ public class Player : TennisPlayer
             card.rectTransform.anchoredPosition = new Vector2((i * 100) - 150, 0); 
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
             //Set each of the child objects to the corresponding data
-            UpdateCardData(currentCardData, deck[i].name, deck[i].waitTime); 
+            UpdateCardData(currentCardData, deck[i].waitTime); 
             //add the current object to deck UI
             deckUI[i] = currentCard; 
         }
@@ -81,10 +81,9 @@ public class Player : TennisPlayer
     }
     
     //Updates the text on the cards 
-    private void UpdateCardData(ref TMP_Text[] data, string name, int waitTime)
+    private void UpdateCardData(ref TMP_Text[] data, int waitTime)
     {
         //update it! (it's almost like setting up a constructor! (we could make it like that, but why?))
-        data[0] = name; 
         data[1] = waitTime.ToString(); 
     }
 
