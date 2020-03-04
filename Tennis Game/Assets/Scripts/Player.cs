@@ -10,6 +10,7 @@ public class Player : TennisPlayer
     [Header("Deck UI")]
     [SerializeField] private GameObject[] deckUI = new GameObject[6];
     [SerializeField] private GameObject cardTemplate; //Get the original cardTemplate object 
+    [SerializeField] private float moveStep; 
 
     //set up UI of current cards
     protected override void SetUpDeckUI()
@@ -59,6 +60,13 @@ public class Player : TennisPlayer
             cardTransform.anchoredPosition = Vector2.Lerp(transform.position, new Vector2((i * 100) -150, -i * 10), 0.5f);
 
         }
+    }
+    
+    //Cards do not have an Update loop to lerp continuously, thus the use of a couroutine
+    private IEnumerator MoveCardUI(ref RectTransform card, int i)
+    {
+        card.anchoredPosition = Vector2.Lerp(transform.position, new Vector2((i * 100) -150, -i * 10), moveStep);
+        yield return null; 
     }
 
     //Compute the movement direction 
