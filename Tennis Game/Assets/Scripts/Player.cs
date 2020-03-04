@@ -23,13 +23,12 @@ public class Player : TennisPlayer
             //Instantiate a new card that represent its corresponding card in "deck"
             GameObject currentCard = Instantiate(cardTemplate, canvas.transform);
             //Get Image that holds card data 
-            Image card = FindObjectOfType<Image>();
+            Image card = currentCard.transform.GetChild(0).gameObject();
             //offset the card a little
             card.rectTransform.anchoredPosition = new Vector2((i * 100) - 150, 0); 
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
             //Set each of the child objects to the corresponding data
-            currentCardData[0].text = deck[i].name;
-            currentCardData[1].text = deck[i].waitTime.ToString(); 
+            UpdateCardData(currentCardData, deck[i].name, deck[i].waitTime); 
             //add the current object to deck UI
             deckUI[i] = currentCard; 
         }
@@ -53,11 +52,23 @@ public class Player : TennisPlayer
             {
                 index -= deck.Length;
             }
-
-            //get rectTransform of Image componenet
-            RectTransform cardTransform = deckUI[index].transform.GetChild(0).GetComponent<RectTransform>();
+            
+            #region ONLY FOR USED CARD AND CARDS WITH UPDATED WAIT TIMES
+            //GET CARD AND ITS DATA
+            //Get the card (<Image>), yo 
+            Image card = deckUI[index].transform.GetChild(0); 
+            //Get the data (<TMP_Text>), or text, from the child object (fields e.g. name, waitTime, etc.)
+            TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
+            #endregion
+            
+            //UPDATE CARD
+            UpdateCardData(currentCardData, deck[i].name, deck[i].waitTime); 
+            
+            //MOVE CARD
+            //get anchoredPosition of Image componenet
+            Vector2 cardTransform = card.rectTransform.anchoredPosition;  
             //Move deck around 
-            StartCoroutine(MoveCard(ref cardTransform.anchoredPosition, targetIndex));
+            StartCoroutine(MoveCard(ref cardTransform, targetIndex));
 
         }
     }
@@ -67,6 +78,14 @@ public class Player : TennisPlayer
     {
         card.anchoredPosition = Vector2.Lerp(transform.position, new Vector2((i * 100) -150, -i * 10), moveStep);
         yield return null; 
+    }
+    
+    //Updates the text on the cards 
+    private void UpdateCardData(ref TMP_Text[] data, string name, int waitTime)
+    {
+        //update it! (it's almost like setting up a constructor! (we could make it like that, but why?))
+        data[0] = name; 
+        data[1] = waitTime.ToString(); 
     }
 
     //Compute the movement direction 
