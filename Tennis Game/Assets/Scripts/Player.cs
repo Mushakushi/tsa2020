@@ -53,13 +53,11 @@ public class Player : TennisPlayer
                 index -= deck.Length;
             }
             
-            #region ONLY FOR USED CARD AND CARDS WITH UPDATED WAIT TIMES
             //GET CARD AND ITS DATA
             //Get the card (<Image>), yo 
             Image card = deckUI[index].transform.GetChild(0); 
             //Get the data (<TMP_Text>), or text, from the child object (fields e.g. name, waitTime, etc.)
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
-            #endregion
             
             //UPDATE CARD
             UpdateCardData(currentCardData, deck[i].name, deck[i].waitTime); 
