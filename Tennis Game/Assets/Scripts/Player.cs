@@ -52,10 +52,8 @@ public class Player : TennisPlayer
 
             int index = targetIndex + i;
             //if too big, loop back around 
-            if (index >= deck.Length)
-            {
+            if (index > deck.Length)
                 index -= deck.Length;
-            }
             
             //GET CARD AND ITS DATA
             //Get the card (<Image>), yo 
