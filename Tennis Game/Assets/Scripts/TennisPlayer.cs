@@ -157,8 +157,10 @@ public class TennisPlayer : MonoBehaviour
         print("Cycling deck");
         //if the card that was just used has a cooldown, reset it's timer 
         if (deck[currentIndex].coolDown > 0)
-            deck[currentIndex].waitTime = 0; 
-        Debug.LogFormat("Card has been deactivated {0}", deck[currentIndex]); 
+        {
+            deck[currentIndex].waitTime = 0;
+            Debug.LogFormat("Card has been deactivated {0}", deck[currentIndex].name);
+        }
         
         //NEW CARD
         //move to the next card in the list and get target card based on index
@@ -183,7 +185,7 @@ public class TennisPlayer : MonoBehaviour
         //we now have a card that is cool-downed
 
         //Return that card 
-        print(targetIndex); 
+        print("next card: " + targetIndex); 
         currentIndex = targetIndex;
         //Update UI (if you're player, of course!)
         if (isPlayer)

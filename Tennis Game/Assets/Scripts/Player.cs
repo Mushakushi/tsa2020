@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System; 
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,8 +11,9 @@ public class Player : TennisPlayer
     [Header("Deck UI")]
     [SerializeField] private GameObject[] deckUI = new GameObject[6];
     [SerializeField] private GameObject cardTemplate; //Get the original cardTemplate object 
-    [SerializeField] private float moveStep; 
+    [SerializeField] private float moveStep;
 
+    #region PLAYER-DECK UI
     //set up UI of current cards
     protected override void SetUpDeckUI()
     {
@@ -23,12 +25,13 @@ public class Player : TennisPlayer
             //Instantiate a new card that represent its corresponding card in "deck"
             GameObject currentCard = Instantiate(cardTemplate, canvas.transform);
             //Get Image that holds card data 
-            Image card = currentCard.transform.GetChild(0).gameObject();
+            Image card = currentCard.transform.GetChild(0).gameObject.GetComponent<Image>();
             //offset the card a little
             card.rectTransform.anchoredPosition = new Vector2((i * 100) - 150, 0); 
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
             //Set each of the child objects to the corresponding data
-            UpdateCardData(currentCardData, deck[i].waitTime); 
+            currentCardData[0].text = deck[i].name; //set up name ONLY HERE (why do it again?)
+            UpdateCardData(ref currentCardData, deck[i].waitTime); 
             //add the current object to deck UI
             deckUI[i] = currentCard; 
         }
@@ -42,48 +45,44 @@ public class Player : TennisPlayer
         {
             //EXAMPLE: 
             //{0}, {1}, {2}, {3}
-            //target index == 2
-            //move {2} first (TI + i == 2), {3} second (TI + i == 3), 
-            //{0} third (TI + i /*==4*/ - length /*==4*/ == 0), {1} fourth (TI + i/*==5*/ - length/*4*/ = 1) 
+            //target index == 1
+            //move {1} first (TI + i == 1), {2} second (TI + i == 2), {3} third (TI + i == 3), 
+            //(TI + i == 4) OUT OF BOUNDS, so....
+            //{0} fourth (TI + i/*==4*/ - length/*4*/ = 0) 
 
             int index = targetIndex + i;
             //if too big, loop back around 
-            if (index > deck.Length - 1)
+            if (index >= deck.Length)
             {
                 index -= deck.Length;
             }
             
             //GET CARD AND ITS DATA
             //Get the card (<Image>), yo 
-            Image card = deckUI[index].transform.GetChild(0); 
+            Image card = deckUI[index].transform.GetChild(0).GetComponent<Image>(); 
             //Get the data (<TMP_Text>), or text, from the child object (fields e.g. name, waitTime, etc.)
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
             
             //UPDATE CARD
-            UpdateCardData(currentCardData, deck[i].name, deck[i].waitTime); 
+            UpdateCardData(ref currentCardData, deck[i].waitTime); 
             
             //MOVE CARD
             //get anchoredPosition of Image componenet
-            Vector2 cardTransform = card.rectTransform.anchoredPosition;  
+            Vector2 cardTransform = card.rectTransform.anchoredPosition;
             //Move deck around 
-            StartCoroutine(MoveCard(ref cardTransform, targetIndex));
-
+            LeanTween.move(card.gameObject, new Vector2((targetIndex * 100) - 150, -targetIndex * 10), moveStep);
+            print("moving card at index: " + targetIndex); 
+            //fun fact: I was doing movement with an IEnumerator and Action<Vector2> stuff; it was crazy. LeanTween to the rescue!!!
         }
-    }
-    
-    //Cards do not have an Update loop to lerp continuously, thus the use of a couroutine
-    private IEnumerator MoveCardUI(ref Vector2 card, int i)
-    {
-        card.anchoredPosition = Vector2.Lerp(transform.position, new Vector2((i * 100) -150, -i * 10), moveStep);
-        yield return null; 
     }
     
     //Updates the text on the cards 
     private void UpdateCardData(ref TMP_Text[] data, int waitTime)
     {
         //update it! (it's almost like setting up a constructor! (we could make it like that, but why?))
-        data[1] = waitTime.ToString(); 
+        data[1].text = waitTime.ToString(); 
     }
+    #endregion
 
     //Compute the movement direction 
     protected override void ComputeDirection()

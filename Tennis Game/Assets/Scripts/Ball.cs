@@ -72,7 +72,12 @@ public class Ball : MonoBehaviour
             }
 
             //if we're not being moved by the tennis racket, then move according to normal gravity and physics bruh 
-            rb.position += velocity.normalized /*sheer direction*/ * distance /*"magnitude"*/ * Time.fixedDeltaTime /*smooth*/;
+            Vector3 moveTo = velocity.normalized /*sheer direction*/ * distance /*"magnitude"*/ * Time.fixedDeltaTime /*smooth*/; 
+            if(!float.IsNaN(moveTo.z))//not sure why the z value would be NAN, but I've gotten this error on ocassion, this is an attempt to stop that 
+            {
+                rb.position += moveTo; 
+            }
+            
         }
 
         //an adapted version of Unity's kinematic Rigidbody Platfomer Character Controller tutorial 

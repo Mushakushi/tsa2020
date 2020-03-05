@@ -503,6 +503,7 @@ MonoBehaviour:
   - {fileID: 0}
   cardTemplate: {fileID: 5481453136547006436, guid: e8fd9701ebd92374490b1a3d15af3924,
     type: 3}
+  moveStep: 0.1
 --- !u!54 &954904919
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1621,7 +1622,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1865342010}
-  m_LocalRotation: {x: 0.21658352, y: -0.00000000839914, z: 0.0000000018640018, w: 0.9762641}
+  m_LocalRotation: {x: 0.21658354, y: 0.000000008398832, z: -0.0000000018626167, w: 0.9762641}
   m_LocalPosition: {x: 0, y: 0.84, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -1781,7 +1782,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1874078634}
-  m_LocalRotation: {x: 0.21658352, y: -0.00000000839914, z: 0.0000000018640018, w: 0.9762641}
+  m_LocalRotation: {x: 0.21658354, y: 0.000000008398832, z: -0.0000000018626167, w: 0.9762641}
   m_LocalPosition: {x: 0, y: 0.84, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
