@@ -89,7 +89,7 @@ class Effects : MonoBehaviour
 {
     public static void Jump(TennisPlayer player)
     {
-        player.targetDirection.y += 2; 
+        player.targetDirection.y += 100; 
     }
 }
 #endregion

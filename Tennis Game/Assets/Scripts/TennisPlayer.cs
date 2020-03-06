@@ -118,18 +118,22 @@ public class TennisPlayer : MonoBehaviour
             Vector3[] pathSnapshot = path;
 
             //Attempt to hitBall(); 
-            hitBall(ball_rb, pathSnapshot); 
+            HitBall(ball_rb, pathSnapshot, deck[currentCardIndex].effect); 
         }
     }
 
     //Child classes will define how the process of hitting the ball works 
-    protected virtual void hitBall(Rigidbody ball_rb, Vector3[] path) { }
+    protected virtual void HitBall(Rigidbody ball_rb, Vector3[] path, Effect effect) { }
     
     //Function to move the ball, wil be called in child classes, as hitting the ball works the same way, just defined differently based on hitBall()
-    protected IEnumerator MoveBall(Rigidbody ball_rb, Vector3[] path)
+    protected IEnumerator MoveBall(Rigidbody ball_rb, Vector3[] path, Effect effect)
     {
         //Don't let ball fall
         ballScript.isMoving = true;
+
+        //Do the effect of the ball 
+        if (effect != null)
+            effect(this); 
 
         //Move the ball 
         for (int i = 0; i <= capacity - 1; i++)

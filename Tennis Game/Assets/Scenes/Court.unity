@@ -503,7 +503,7 @@ MonoBehaviour:
   - {fileID: 0}
   cardTemplate: {fileID: 5481453136547006436, guid: e8fd9701ebd92374490b1a3d15af3924,
     type: 3}
-  moveStep: 0.1
+  moveStep: 0
 --- !u!54 &954904919
 Rigidbody:
   m_ObjectHideFlags: 0

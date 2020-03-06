@@ -52,9 +52,9 @@ public class Player : TennisPlayer
 
             int index = targetIndex + i;
             //if too big, loop back around 
-            if (index > deck.Length)
+            if (index > deck.Length - 1)
                 index -= deck.Length;
-            
+
             //GET CARD AND ITS DATA
             //Get the card (<Image>), yo 
             Image card = deckUI[index].transform.GetChild(0).GetComponent<Image>(); 
@@ -88,10 +88,10 @@ public class Player : TennisPlayer
         targetDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * moveSpeed; 
     }
 
-    protected override void hitBall(Rigidbody ball_rb, Vector3[] path)
+    protected override void HitBall(Rigidbody ball_rb, Vector3[] path, Effect effect)
     {
         //if we succssesfully hit the ball 
         if (Input.GetMouseButton(0))
-            StartCoroutine(MoveBall(ball_rb, path)); 
+            StartCoroutine(MoveBall(ball_rb, path, effect)); 
     }
 }
