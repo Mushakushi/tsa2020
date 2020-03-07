@@ -490,6 +490,7 @@ MonoBehaviour:
   aimTarget: {fileID: 1979548057}
   netPositionTop: {fileID: 1864518889}
   capacity: 25
+  isMoveBallRunning: 0
   path: []
   lineRenderer: {fileID: 0}
   targetDirection: {x: 0, y: 0, z: 0}
@@ -1147,6 +1148,7 @@ MonoBehaviour:
   aimTarget: {fileID: 954904917}
   netPositionTop: {fileID: 1864518889}
   capacity: 25
+  isMoveBallRunning: 0
   path: []
   lineRenderer: {fileID: 0}
   targetDirection: {x: 0, y: 0, z: 0}
@@ -1622,7 +1624,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1865342010}
-  m_LocalRotation: {x: 0.21658352, y: -0.00000000839914, z: 0.0000000018640018, w: 0.9762641}
+  m_LocalRotation: {x: 0.21658354, y: 0.000000008398832, z: -0.0000000018626167, w: 0.9762641}
   m_LocalPosition: {x: 0, y: 0.84, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -1782,7 +1784,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1874078634}
-  m_LocalRotation: {x: 0.21658352, y: -0.00000000839914, z: 0.0000000018640018, w: 0.9762641}
+  m_LocalRotation: {x: 0.21658354, y: 0.000000008398832, z: -0.0000000018626167, w: 0.9762641}
   m_LocalPosition: {x: 0, y: 0.84, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:

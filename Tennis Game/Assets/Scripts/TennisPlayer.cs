@@ -26,6 +26,7 @@ public class TennisPlayer : MonoBehaviour
     [SerializeField] protected Transform aimTarget;
     [SerializeField] protected Transform netPositionTop;
     [SerializeField] protected int capacity = 25; //how to much increments over bezier curve path 
+    [SerializeField] protected bool isMoveBallRunning = false;
 
     [Header("Aim Visual")]
     [SerializeField] protected Vector3[] path;
@@ -128,6 +129,9 @@ public class TennisPlayer : MonoBehaviour
     //Function to move the ball, wil be called in child classes, as hitting the ball works the same way, just defined differently based on hitBall()
     protected IEnumerator MoveBall(Rigidbody ball_rb, Vector3[] path, Effect effect)
     {
+        //Don't run this script multiple times!
+        isMoveBallRunning = true; 
+
         //Don't let ball fall
         ballScript.isMoving = true;
 
@@ -149,9 +153,12 @@ public class TennisPlayer : MonoBehaviour
         CycleDeck(ref currentCardIndex);
 
         //tell the ball that it is no longer moving and give it velocity based on movement 
-        print(ball_rb.position - ballScript.previousPos); 
+        print("ball velocity == " + (ball_rb.position - ballScript.previousPos)); 
         ballScript.velocity = ball_rb.position - ballScript.previousPos; 
         ballScript.isMoving = false;
+
+        //this script is no longer running 
+        isMoveBallRunning = false; 
     }
 
     //Cycle through the deck 
@@ -189,7 +196,7 @@ public class TennisPlayer : MonoBehaviour
         //we now have a card that is cool-downed
 
         //Return that card 
-        print("next card: " + targetIndex); 
+        print("NEXT CARD: " + targetIndex); 
         currentIndex = targetIndex;
         //Update UI (if you're player, of course!)
         if (isPlayer)
@@ -204,7 +211,8 @@ public class TennisPlayer : MonoBehaviour
         if (index > deck.Length - 1)
             index = 0;
         //target Card based on the set index
-        target = deck[index]; 
+        target = deck[index];
+        print("currently checking/ moving to: " + index); 
     }
 
 }

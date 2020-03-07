@@ -41,7 +41,7 @@ public class Player : TennisPlayer
     protected override void UpdateDeckUI(int targetIndex)
     {
         //go through every element of the deck 
-        for (int i = 0; i < deck.Length - 1; i++)
+        for (int i = 0; i < deck.Length; i++)
         {
             //EXAMPLE: 
             //{0}, {1}, {2}, {3}
@@ -54,6 +54,9 @@ public class Player : TennisPlayer
             //if too big, loop back around 
             if (index > deck.Length - 1)
                 index -= deck.Length;
+
+            //DEBUGG
+            print("moving card at index: " + index);
 
             //GET CARD AND ITS DATA
             //Get the card (<Image>), yo 
@@ -69,7 +72,6 @@ public class Player : TennisPlayer
             Vector2 cardTransform = card.rectTransform.anchoredPosition;
             //Move deck around 
             LeanTween.move(card.gameObject, new Vector2((targetIndex * 100) - 150, -targetIndex * 10), moveStep);
-            print("moving card at index: " + targetIndex); 
             //fun fact: I was doing movement with an IEnumerator and Action<Vector2> stuff; it was crazy. LeanTween to the rescue!!!
         }
     }
@@ -91,7 +93,7 @@ public class Player : TennisPlayer
     protected override void HitBall(Rigidbody ball_rb, Vector3[] path, Effect effect)
     {
         //if we succssesfully hit the ball 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && !isMoveBallRunning)
             StartCoroutine(MoveBall(ball_rb, path, effect)); 
     }
 }
