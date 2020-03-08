@@ -2,19 +2,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//RALLY CARDS HELP RALLY THE BALL (attack/defense/stat buff)
+//CARDS THAT RALLY/Serve THE BALL 
 public delegate Vector3[] Path(Vector3 A, Vector3 point, Vector3 C, int capacity, bool isPlayer); //path that the ball will follow
-public delegate void Effect(TennisPlayer player); //misc effect of card
-public class Card
+public delegate void Effect(Rigidbody player, Rigidbody ball); //misc effect of card
+
+//BASE CARD
+public class _Card
 {
     public Path path; //path the ball will hit
     public float speedMultiplier; //how fast will the ball be hit?
-    public Effect effect; //mis effect that ball wil have (if applicable)
-    public int waitTime; //how long have we waited for activation after cooldown? Cards reactivate once we have waited for cooldown 
-    public int coolDown; //how long it takes until this card can be used again
-
+    public Effect effect; //mis effect that ball wil have (if applicable) 
     public string name; //name of the card; 
     public Color color; //color of line made by this card 
+}
+
+//Serving Cards 
+public class ServeCard : _Card
+{
+    public ServeCard(Path pathToFollow, float SpeedMultiplier, Effect misEffect, string Name, Color lineColor)
+    {
+        path = pathToFollow;
+        speedMultiplier = SpeedMultiplier;
+        effect = misEffect;
+        name = Name;
+        color = lineColor; 
+    }
+}
+
+//"Normal" Cards (exclude serving cards)
+public class Card : _Card
+{
+    public int waitTime; //how long have we waited for activation after cooldown? Cards reactivate once we have waited for cooldown 
+    public int coolDown; //how long it takes until this card can be used again
 
     //Constructor for the card
     public Card(Path pathToFollow, float SpeedMultiplier, Effect miscEffect, int CoolDown, string Name,  Color lineColor)
@@ -87,10 +106,11 @@ public class Paths
 #region EFFECTS
 class Effects : MonoBehaviour
 {
-    public static void Jump(TennisPlayer player)
+    public static void Jump(Rigidbody player, Rigidbody ball)
     {
-        player.targetDirection.y += 100; 
+        player.AddForce(Vector3.up * 3, ForceMode.Impulse);
     }
+    
 }
 #endregion
 
@@ -99,5 +119,8 @@ public class AllCards : MonoBehaviour
 {
     //Attacking
     public Card normal_a = new Card(Paths.NormalBezier, 1f, null, 0, "Normal",  Color.blue);
-    public Card jumpShot_a = new Card(Paths.Linear, 2f, Effects.Jump, 1, "Jump Shot", Color.red); 
+    public Card jumpShot_a = new Card(Paths.Linear, 2f, Effects.Jump, 1, "Jump Shot", Color.red);
+
+    //Serve Card
+    public ServeCard normal_s = new ServeCard(Paths.NormalBezier, 1f, null, "Flat", Color.blue); 
 }

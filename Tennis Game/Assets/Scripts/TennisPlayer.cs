@@ -39,7 +39,7 @@ public class TennisPlayer : MonoBehaviour
     [SerializeField] protected Rigidbody rb;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         isPlayer = gameObject.CompareTag("Player");
         rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
@@ -68,8 +68,6 @@ public class TennisPlayer : MonoBehaviour
 
         lineRenderer = GameObject.Find(isPlayer ? "Player Aim Line" : "Opponent Aim Line").GetComponent<LineRenderer>();
         lineRenderer.positionCount = capacity;
-
-        
     }
 
     //Set up the deck UI (only for player)
@@ -97,8 +95,9 @@ public class TennisPlayer : MonoBehaviour
     {
         //clamp tennis players to bounds based on whothey are 
         transform.position = new Vector3(Mathf.Clamp(transform.position.x, -1.5f, 1.5f), transform.position.y,
+                                                        //P    //O
             Mathf.Clamp(transform.position.z, isPlayer ? -4f : 0.1f,
-            isPlayer ? -0.5f : 4f));
+                                            isPlayer ? -0.5f : 4f));
         //Compute direction   
         ComputeDirection();
         //If we're actually moving...
@@ -135,15 +134,15 @@ public class TennisPlayer : MonoBehaviour
         //Don't let ball fall
         ballScript.isMoving = true;
 
-        //Do the effect of the ball 
-        if (effect != null)
-            effect(this); 
+        //Reset the bounce count
+        ballScript.bounces = 0; 
+
+        //Do the effect of the ball as long as it is not null
+        effect?.Invoke(rb, ball_rb);
 
         //Move the ball 
         for (int i = 0; i <= capacity - 1; i++)
         {
-            //store previous postion of ball 
-            ballScript.previousPos = ball_rb.position;
             //where the acutal movement comes from (kind of)
             ball_rb.position = Vector3.Lerp(transform.position, path[i], deck[currentCardIndex].speedMultiplier);
             yield return null;
@@ -153,8 +152,9 @@ public class TennisPlayer : MonoBehaviour
         CycleDeck(ref currentCardIndex);
 
         //tell the ball that it is no longer moving and give it velocity based on movement 
-        print("ball velocity == " + (ball_rb.position - ballScript.previousPos)); 
-        ballScript.velocity = ball_rb.position - ballScript.previousPos; 
+        ballScript.velocity = transform.position - path[(int)Mathf.Ceil(path.Length/2)];
+        print("ball velocity == " + (ballScript.velocity)); 
+        
         ballScript.isMoving = false;
 
         //this script is no longer running 

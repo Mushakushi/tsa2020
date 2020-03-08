@@ -13,12 +13,21 @@ public class Player : TennisPlayer
     [SerializeField] private GameObject cardTemplate; //Get the original cardTemplate object 
     [SerializeField] private float moveStep;
 
+    [Header("Spacing")]
+    [SerializeField] private Transform start;
+    [SerializeField] private float spacing;
+
+    [Header("Animation")]
+    [SerializeField] AnimationCurve easeCurve; 
+
     #region PLAYER-DECK UI
     //set up UI of current cards
     protected override void SetUpDeckUI()
     {
         //Get the UI Canvas 
-        Canvas canvas = GameObject.Find("UI").GetComponent<Canvas>(); 
+        Canvas canvas = GameObject.Find("UI").GetComponent<Canvas>();
+        //Get the staring position of the cards 
+        start = GameObject.Find("Card UI Start").GetComponent<Transform>();
         //Go over every element in deck UI 
         for (int i = 0; i <= deckUI.Length - 1; i++)
         {
@@ -27,11 +36,11 @@ public class Player : TennisPlayer
             //Get Image that holds card data 
             Image card = currentCard.transform.GetChild(0).gameObject.GetComponent<Image>();
             //offset the card a little
-            card.rectTransform.anchoredPosition = new Vector2((i * 100) - 150, 0); 
+            LeanTween.move(card.gameObject, start.position + (i == 0 ? Vector3.zero : Vector3.right * spacing), moveStep).setEase(easeCurve); 
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
             //Set each of the child objects to the corresponding data
             currentCardData[0].text = deck[i].name; //set up name ONLY HERE (why do it again?)
-            UpdateCardData(ref currentCardData, deck[i].waitTime); 
+            UpdateCardData(ref currentCardData, deck[i].name, deck[i].waitTime); 
             //add the current object to deck UI
             deckUI[i] = currentCard; 
         }
@@ -65,21 +74,22 @@ public class Player : TennisPlayer
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
             
             //UPDATE CARD
-            UpdateCardData(ref currentCardData, deck[i].waitTime); 
+            UpdateCardData(ref currentCardData, deck[i].name, deck[i].waitTime); 
             
             //MOVE CARD
             //get anchoredPosition of Image componenet
             Vector2 cardTransform = card.rectTransform.anchoredPosition;
             //Move deck around 
-            LeanTween.move(card.gameObject, new Vector2((targetIndex * 100) - 150, -targetIndex * 10), moveStep);
+            LeanTween.move(card.gameObject, start.position + (i == targetIndex ? Vector3.zero : Vector3.right * spacing), moveStep);
             //fun fact: I was doing movement with an IEnumerator and Action<Vector2> stuff; it was crazy. LeanTween to the rescue!!!
         }
     }
     
     //Updates the text on the cards 
-    private void UpdateCardData(ref TMP_Text[] data, int waitTime)
+    private void UpdateCardData(ref TMP_Text[] data, string name, int waitTime)
     {
         //update it! (it's almost like setting up a constructor! (we could make it like that, but why?))
+        data[0].text = name;
         data[1].text = waitTime.ToString(); 
     }
     #endregion
@@ -87,7 +97,7 @@ public class Player : TennisPlayer
     //Compute the movement direction 
     protected override void ComputeDirection()
     {
-        targetDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * moveSpeed; 
+        targetDirection = new Vector3(Input.GetAxis("Horizontal"), targetDirection.y, Input.GetAxis("Vertical")) * moveSpeed; 
     }
 
     protected override void HitBall(Rigidbody ball_rb, Vector3[] path, Effect effect)
