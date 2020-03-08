@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System; 
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; 
@@ -20,16 +21,26 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject opponent;
 
+    [Header("Tennis Court")]
+    [SerializeField] private Transform playerStart;
+    [SerializeField] private Transform opponentStart; 
+
     [Header("UI")]
     [SerializeField] private Image scoreBoard;
     [SerializeField] private TMP_Text playerScoreText;
-    [SerializeField] private TMP_Text opponentScoreText; 
+    [SerializeField] private TMP_Text opponentScoreText;
+
+    [Header("Ease Types")]
+    [SerializeField] private AnimationCurve scoreCurve; 
 
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         opponent = GameObject.FindGameObjectWithTag("Opponent");
+
+        playerStart = GameObject.Find("Player Start").GetComponent<Transform>();
+        opponentStart = GameObject.Find("Opponent Start").GetComponent<Transform>(); 
 
         scoreBoard = GameObject.Find("Score").GetComponent<Image>();
         playerScoreText = scoreBoard.transform.GetChild(0).GetComponent<TMP_Text>();
@@ -43,10 +54,10 @@ public class GameManager : MonoBehaviour
         //Scores point if bounces > 2 on other side 
 
         //Opponent scores a point!
-        if ((ballScript.rb.position.z > 4f && ballScript.bounces == 0) || (ballScript.bounces > 2 && ballScript.rb.position.z < 0.5f))
+        if ((ballScript.rb.position.z > 4f && ballScript.bounces == 0) || (ballScript.bounces > 1 && ballScript.rb.position.z < 0.5f))
             ScorePoint(false);
         //Player scores a point!
-        else if ((ballScript.rb.position.z < -4f && ballScript.bounces == 0) || (ballScript.bounces > 2 && ballScript.rb.position.z > 0.1f))
+        else if ((ballScript.rb.position.z < -4f && ballScript.bounces == 0) || (ballScript.bounces > 1 && ballScript.rb.position.z > 0.1f))
             ScorePoint(true);
 
         //Check if ball's position is less than 0 (that's not supposed to happen, duh)
@@ -59,31 +70,54 @@ public class GameManager : MonoBehaviour
         //stop moving, boru!
         ballScript.isMoving = true;
 
+        //Move player and opponent to starting positions 
+        LeanTween.move(player, playerStart.position, 5f);
+        LeanTween.move(opponent, opponentStart.position, 5f); 
+
         //move to winner
         if (playerScored)
         {
-            playerScore++;
-            ballScript.rb.position = player.transform.position;
-            playerScoreText.text = playerScore.ToString(); 
+            UpdateScore(playerScoreText, ref playerScore); 
         }
         else
         {
-            opponentScore++;
-            ballScript.rb.position = opponent.transform.position;
-            opponentScoreText.text = opponentScore.ToString(); 
+            UpdateScore(opponentScoreText, ref opponentScore); 
         }
+
+        //Wait until player is halfway between its starting point 
+        StartCoroutine(WaitUntil(()=> playerStart.position == player.transform.position));
+
+        //Swap the x positions of the player start positions (a rule in tennis)
+        float temp = playerStart.position.x;
+        playerStart.position = Vector3.right * opponentStart.position.x;
+        opponentStart.position = Vector3.right * temp; 
+
+
+        ballScript.rb.position = playerScored? player.transform.position : opponent.transform.position;
 
         //Hold the ball!
         //TODO: send to a set point!
         ballScript.velocity = Vector3.zero;
-        player.transform.position = Vector3.back * 2;
-        opponent.transform.position = Vector3.forward * 2;
+        
 
-        StartCoroutine(Wait()); 
+        StartCoroutine(Wait(2f)); 
     }
 
-    IEnumerator Wait()
+    IEnumerator Wait(float seconds)
     {
-        yield return new WaitForSeconds(2f); 
+        yield return new WaitForSeconds(seconds); 
+    }
+
+    IEnumerator WaitUntil(Func<bool> predicate)
+    {
+        yield return new WaitUntil(predicate); 
+    }
+
+    void UpdateScore(TMP_Text text, ref int score)
+    {
+        score++;
+        string value = score.ToString();
+        text.text = value;
+        LeanTween.scale(text.gameObject, Vector3.one, 0.1f).setEase(scoreCurve); 
     }
 }
