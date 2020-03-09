@@ -869,7 +869,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 0
-  allCardsScript: {fileID: 0}
   currentCardIndex: 0
   hitForce: 1
   moveSpeed: 10
@@ -882,6 +881,7 @@ MonoBehaviour:
   path: []
   lineRenderer: {fileID: 0}
   targetDirection: {x: 0, y: 0, z: 0}
+  canMove: 1
   rb: {fileID: 954904919}
   deckUI:
   - {fileID: 0}
@@ -1601,7 +1601,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPlayer: 0
-  allCardsScript: {fileID: 0}
   currentCardIndex: 0
   hitForce: 0.01
   moveSpeed: 100
@@ -1614,6 +1613,7 @@ MonoBehaviour:
   path: []
   lineRenderer: {fileID: 0}
   targetDirection: {x: 0, y: 0, z: 0}
+  canMove: 1
   rb: {fileID: 1686891926}
 --- !u!54 &1686891926
 Rigidbody:
@@ -2086,7 +2086,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1865342010}
-  m_LocalRotation: {x: 0.21658352, y: -0.00000000839914, z: 0.0000000018640018, w: 0.9762641}
+  m_LocalRotation: {x: 0.21658354, y: 0.000000008398832, z: -0.0000000018626167, w: 0.9762641}
   m_LocalPosition: {x: 0, y: 0.84, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -2246,7 +2246,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1874078634}
-  m_LocalRotation: {x: 0.21658352, y: -0.00000000839914, z: 0.0000000018640018, w: 0.9762641}
+  m_LocalRotation: {x: 0.21658354, y: 0.000000008398832, z: -0.0000000018626167, w: 0.9762641}
   m_LocalPosition: {x: 0, y: 0.84, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2296,7 +2296,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: 1.999939}
+  m_AnchoredPosition: {x: 0, y: 2}
   m_SizeDelta: {x: 600, y: 100}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1966568636

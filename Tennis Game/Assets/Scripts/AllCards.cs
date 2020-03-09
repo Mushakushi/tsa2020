@@ -118,9 +118,9 @@ class Effects : MonoBehaviour
 public class AllCards : MonoBehaviour
 {
     //Attacking
-    public Card normal_a = new Card(Paths.NormalBezier, 1f, null, 0, "Normal",  Color.blue);
-    public Card jumpShot_a = new Card(Paths.Linear, 2f, Effects.Jump, 1, "Jump Shot", Color.red);
+    public static Card normal_a = new Card(Paths.NormalBezier, 1f, null, 0, "Normal",  Color.blue);
+    public static Card jumpShot_a = new Card(Paths.Linear, 2f, Effects.Jump, 1, "Jump Shot", Color.red);
 
     //Serve Card
-    public ServeCard normal_s = new ServeCard(Paths.NormalBezier, 1f, null, "Flat", Color.blue); 
+    public static ServeCard normal_s = new ServeCard(Paths.NormalBezier, 1f, null, "Flat", Color.blue); 
 }

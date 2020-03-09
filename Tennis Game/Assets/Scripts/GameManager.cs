@@ -23,7 +23,12 @@ public class GameManager : MonoBehaviour
 
     [Header("Tennis Court")]
     [SerializeField] private Transform playerStart;
-    [SerializeField] private Transform opponentStart; 
+    [SerializeField] private Transform opponentStart;
+
+    [Header("Tennis Rules")]
+    public static GameManager instance;//instance (singleton) of this class
+    public event Action onSetEnd; //what happens when the set ends?
+    public event Action onSetStart; //what happens when the set starts?
 
     [Header("UI")]
     [SerializeField] private Image scoreBoard;
@@ -31,7 +36,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text opponentScoreText;
 
     [Header("Ease Types")]
-    [SerializeField] private AnimationCurve scoreCurve; 
+    [SerializeField] private AnimationCurve scoreCurve;
+
+    //Set up singleton
+    private void Awake()
+    {
+        instance = this; //singleton pattern
+        instance.onSetEnd += OnSetEnd; 
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -44,7 +56,7 @@ public class GameManager : MonoBehaviour
 
         scoreBoard = GameObject.Find("Score").GetComponent<Image>();
         playerScoreText = scoreBoard.transform.GetChild(0).GetComponent<TMP_Text>();
-        opponentScoreText = scoreBoard.transform.GetChild(1).GetComponent<TMP_Text>(); 
+        opponentScoreText = scoreBoard.transform.GetChild(1).GetComponent<TMP_Text>();
     }
 
     // Update is called once per frame
@@ -71,36 +83,23 @@ public class GameManager : MonoBehaviour
         ballScript.isMoving = true;
 
         //Move player and opponent to starting positions 
-        LeanTween.move(player, playerStart.position, 5f);
-        LeanTween.move(opponent, opponentStart.position, 5f); 
+        LeanTween.move(player, playerStart.position, 10f);
+        LeanTween.move(opponent, opponentStart.position, 10f);
 
         //move to winner
         if (playerScored)
         {
-            UpdateScore(playerScoreText, ref playerScore); 
+            UpdateScore(playerScoreText, ref playerScore);
         }
         else
         {
-            UpdateScore(opponentScoreText, ref opponentScore); 
+            UpdateScore(opponentScoreText, ref opponentScore);
         }
 
-        //Wait until player is halfway between its starting point 
-        StartCoroutine(WaitUntil(()=> playerStart.position == player.transform.position));
+        //Wait until player is halfway between its starting point (the set DOES NOT BEGIN until players have returned to starting positions)
+        StartCoroutine(WaitUntil(() => player.transform.position == playerStart.position, onSetEnd));
 
-        //Swap the x positions of the player start positions (a rule in tennis)
-        float temp = playerStart.position.x;
-        playerStart.position = new Vector3(opponentStart.position.x, playerStart.position.y ,playerStart.position.z);
-        opponentStart.position = new Vector3(temp,opponentStart.position.y, opponentStart.position.z); 
-
-
-        ballScript.rb.position = playerScored? player.transform.position : opponent.transform.position;
-
-        //Hold the ball!
-        //TODO: send to a set point!
-        ballScript.velocity = Vector3.zero;
-        
-
-        StartCoroutine(Wait(2f)); 
+        ballScript.rb.position = playerScored ? player.transform.position : opponent.transform.position;
     }
 
     IEnumerator Wait(float seconds)
@@ -108,9 +107,11 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(seconds); 
     }
 
-    IEnumerator WaitUntil(Func<bool> predicate)
+    IEnumerator WaitUntil(Func<bool> predicate, Action action)
     {
-        yield return new WaitUntil(predicate); 
+        if (!predicate())
+            yield return null;
+        action?.Invoke();
     }
 
     void UpdateScore(TMP_Text text, ref int score)
@@ -119,5 +120,16 @@ public class GameManager : MonoBehaviour
         string value = score.ToString();
         text.text = value;
         LeanTween.scale(text.gameObject, Vector3.one * 5f, 0.1f).setEase(scoreCurve).setLoopPingPong(); 
+    }
+
+    void OnSetEnd()
+    {
+        //Swap the x positions of the player start positions (a rule in tennis) for next set 
+        float temp = playerStart.position.x;
+        playerStart.position = new Vector3(opponentStart.position.x, playerStart.position.y, playerStart.position.z);
+        opponentStart.position = new Vector3(temp, opponentStart.position.y, opponentStart.position.z);
+        //give the ball to the winner 
+        //Hold the ball!
+        ballScript.velocity = Vector3.zero;
     }
 }

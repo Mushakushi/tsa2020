@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class TennisPlayer : MonoBehaviour
 {
-
     //note: player in this script refers to the tennis player, not just the player-player
     [Header("Child Identification")]
     [SerializeField] protected bool isPlayer;
 
     [Header("Deck")]
-    [SerializeField] protected AllCards allCardsScript;
     [SerializeField] protected Card[] deck = new Card[6]; //list of cards (deck) tennis player uses to play
     [SerializeField] protected int currentCardIndex; 
 
@@ -33,25 +31,33 @@ public class TennisPlayer : MonoBehaviour
     [SerializeField] protected LineRenderer lineRenderer; 
 
     [Header("Movement")]
-    [SerializeField] public Vector3 targetDirection; 
+    [SerializeField] public Vector3 targetDirection;
+    [SerializeField] protected bool canMove = true; //can we move?
 
     [Header("RigidBody")]
     [SerializeField] protected Rigidbody rb;
 
+    private void Awake()
+    {
+        //ADD FUNCTIONS TO GAME MANAGER EVENTS
+        GameManager.instance.onSetEnd += OnSetEnd;
+        GameManager.instance.onSetStart += OnSetStart;
+    }
+
+    #region Start
     // Start is called before the first frame update
     private void Start()
     {
-        isPlayer = gameObject.CompareTag("Player");
+        isPlayer = gameObject.CompareTag("Player"); //identify whether this is the player or not
         rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
 
         //TEST
-        allCardsScript = GameObject.FindGameObjectWithTag("Game Manager").GetComponent<AllCards>();
-        deck[0] = allCardsScript.normal_a;
-        deck[1] = allCardsScript.jumpShot_a;
-        deck[2] = allCardsScript.normal_a;
-        deck[3] = allCardsScript.jumpShot_a;
-        deck[4] = allCardsScript.normal_a;
-        deck[5] = allCardsScript.jumpShot_a;
+        deck[0] = AllCards.normal_a;
+        deck[1] = AllCards.jumpShot_a;
+        deck[2] = AllCards.normal_a;
+        deck[3] = AllCards.jumpShot_a;
+        deck[4] = AllCards.normal_a;
+        deck[5] = AllCards.jumpShot_a;
 
         //if is player, set up UI for deck 
         if (isPlayer)
@@ -69,11 +75,34 @@ public class TennisPlayer : MonoBehaviour
         lineRenderer = GameObject.Find(isPlayer ? "Player Aim Line" : "Opponent Aim Line").GetComponent<LineRenderer>();
         lineRenderer.positionCount = capacity;
     }
+    #endregion
 
+    #region Events
+    //What to do when the set ends 
+    private void OnSetEnd()
+    {
+        canMove = false;
+    }
+
+    //What to do when the set starts
+    private void OnSetStart()
+    {
+        canMove = true; 
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.instance.onSetEnd -= OnSetEnd;
+        GameManager.instance.onSetStart -= OnSetStart; 
+    }
+    #endregion
+
+    #region Player UI
     //Set up the deck UI (only for player)
     protected virtual void SetUpDeckUI() { }
     //Update the deck UI (only for player)
     protected virtual void UpdateDeckUI(int targetIndex) { }
+    #endregion 
 
     // Update is called once per frame
     void Update()
@@ -108,6 +137,7 @@ public class TennisPlayer : MonoBehaviour
     //player and AI move differently 
     protected virtual void ComputeDirection(){}
 
+    #region Ball Hitting Functionality
     //return the ball. This is put inside of OnTriggerStay becuase each of these classes will use it anyways!
     private void OnTriggerStay(Collider other)
     {
@@ -160,7 +190,9 @@ public class TennisPlayer : MonoBehaviour
         //this script is no longer running 
         isMoveBallRunning = false; 
     }
+    #endregion
 
+    #region Deck Functionality
     //Cycle through the deck 
     public void CycleDeck(ref int currentIndex)
     {
@@ -196,7 +228,6 @@ public class TennisPlayer : MonoBehaviour
         //we now have a card that is cool-downed
 
         //Return that card 
-        print("NEXT CARD: " + targetIndex); 
         currentIndex = targetIndex;
         //Update UI (if you're player, of course!)
         if (isPlayer)
@@ -212,7 +243,7 @@ public class TennisPlayer : MonoBehaviour
             index = 0;
         //target Card based on the set index
         target = deck[index];
-        print("currently checking/ moving to: " + index); 
     }
+    #endregion
 
 }

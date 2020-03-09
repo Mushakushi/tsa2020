@@ -97,13 +97,14 @@ public class Player : TennisPlayer
     //Compute the movement direction 
     protected override void ComputeDirection()
     {
-        targetDirection = new Vector3(Input.GetAxis("Horizontal"), targetDirection.y, Input.GetAxis("Vertical")) * moveSpeed; 
+        targetDirection = canMove ? new Vector3(Input.GetAxis("Horizontal"), targetDirection.y, Input.GetAxis("Vertical")) * moveSpeed :
+            Vector3.zero; 
     }
 
     protected override void HitBall(Rigidbody ball_rb, Vector3[] path, Effect effect)
     {
         //if we succssesfully hit the ball 
-        if (Input.GetMouseButton(0) && !isMoveBallRunning)
+        if (Input.GetMouseButton(0) && !isMoveBallRunning && canMove)
             StartCoroutine(MoveBall(ball_rb, path, effect)); 
     }
 }
