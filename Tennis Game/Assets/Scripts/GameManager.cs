@@ -89,8 +89,8 @@ public class GameManager : MonoBehaviour
 
         //Swap the x positions of the player start positions (a rule in tennis)
         float temp = playerStart.position.x;
-        playerStart.position = Vector3.right * opponentStart.position.x;
-        opponentStart.position = Vector3.right * temp; 
+        playerStart.position = new Vector3(1,0,playerStart.position.z) * opponentStart.position.x;
+        opponentStart.position = new Vector3(1,0,opponentStart.position.z)* temp; 
 
 
         ballScript.rb.position = playerScored? player.transform.position : opponent.transform.position;
@@ -118,6 +118,6 @@ public class GameManager : MonoBehaviour
         score++;
         string value = score.ToString();
         text.text = value;
-        LeanTween.scale(text.gameObject, Vector3.one, 0.1f).setEase(scoreCurve); 
+        LeanTween.scale(text.gameObject, Vector3.one * 5f, 0.1f).setEase(scoreCurve).setLoopPingPong(); 
     }
 }
