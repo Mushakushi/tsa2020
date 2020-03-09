@@ -89,8 +89,8 @@ public class GameManager : MonoBehaviour
 
         //Swap the x positions of the player start positions (a rule in tennis)
         float temp = playerStart.position.x;
-        playerStart.position = new Vector3(1,0,playerStart.position.z) * opponentStart.position.x;
-        opponentStart.position = new Vector3(1,0,opponentStart.position.z)* temp; 
+        playerStart.position = new Vector3(opponentStart.position.x, playerStart.position.y ,playerStart.position.z);
+        opponentStart.position = new Vector3(temp,opponentStart.position.y, opponentStart.position.z); 
 
 
         ballScript.rb.position = playerScored? player.transform.position : opponent.transform.position;
