@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         instance = this; //singleton pattern
-        instance.onSetEnd += OnSetEnd; 
+        instance.onSetStart += OnSetStart; 
     }
 
     // Start is called before the first frame update
@@ -83,38 +83,43 @@ public class GameManager : MonoBehaviour
         ballScript.isMoving = true;
 
         //Move player and opponent to starting positions 
-        //LeanTween.move(player, playerStart.position, 10f);
-        player.transform.position = playerStart.position;
-        opponent.transform.position = opponentStart.position; 
-        //LeanTween.move(opponent, opponentStart.position, 10f);
+        LeanTween.move(player, playerStart.position, 2f);
+        LeanTween.move(opponent, opponentStart.position, 1f);
 
         //move to winner
         if (playerScored)
         {
-            UpdateScore(playerScoreText, ref playerScore);
+            UpdateScore(playerScoreText, ref playerScore); print("player scores!");
         }
         else
         {
             UpdateScore(opponentScoreText, ref opponentScore);
         }
 
+        onSetEnd();
+
         //Wait until player is halfway between its starting point (the set DOES NOT BEGIN until players have returned to starting positions)
-        StartCoroutine(WaitUntil(() => player.transform.position == playerStart.position, 
-            ()=> { onSetEnd(); ballScript.rb.position = playerScored ? player.transform.position : opponent.transform.position;})
-        );
+        StartCoroutine(WaitUntil(
+            //don't check the y, becuase gravity doesn't play nice
+            () => Mathf.RoundToInt(player.transform.position.x) == Mathf.RoundToInt(playerStart.position.x) 
+            && Mathf.RoundToInt(player.transform.position.z) == Mathf.RoundToInt(playerStart.position.z),
+            () => {
+                ballScript.rb.position = (playerScored ? player.transform.position : opponent.transform.position) + Vector3.up * 0.5f; /*give ball  to winner*/
+                StartCoroutine(WaitFor(1f, onSetStart));
+            })
+        ); 
     }
 
-    IEnumerator Wait(float seconds)
+    //Two functions that do the same thing, just differently (waiting, then doing! [or just waiting, if you throw in null])
+    IEnumerator WaitFor(float seconds, Action action)
     {
-        yield return new WaitForSeconds(seconds); 
+        yield return new WaitForSeconds(seconds);
+        action?.Invoke(); 
     }
 
     IEnumerator WaitUntil(Func<bool> predicate, Action action)
     {
-        if (!predicate())
-        {
-            yield return null;
-        }
+        yield return new WaitUntil(predicate); 
         action?.Invoke();
     }
 
@@ -123,15 +128,21 @@ public class GameManager : MonoBehaviour
         score++;
         string value = score.ToString();
         text.text = value;
-        LeanTween.scale(text.gameObject, Vector3.one * 5f, 0.1f).setEase(scoreCurve).setLoopPingPong(); 
+        LeanTween.scale(text.gameObject, Vector3.one * 5f, 0.1f).setEase(scoreCurve); 
     }
 
-    void OnSetEnd()
+    //Extra functionality
+    void OnSetStart()
     {
         //Swap the x positions of the player start positions (a rule in tennis) for next set 
         float temp = playerStart.position.x;
         playerStart.position = new Vector3(opponentStart.position.x, playerStart.position.y, playerStart.position.z);
         opponentStart.position = new Vector3(temp, opponentStart.position.y, opponentStart.position.z);
         //give the ball to the winner 
+    }
+
+    void OnSetEnd()
+    {
+        
     }
 }

@@ -31,18 +31,20 @@ public class Ball : MonoBehaviour
         GameManager.instance.onSetStart += OnSetStart; 
     }
 
+    #region Events
     //On set end 
     private void OnSetEnd()
     {
         //Hold the ball!
         velocity = Vector3.zero;
         isMoving = true;
+        bounces = 0;
     }
 
     //On set start 
     private void OnSetStart()
     {
-        isMoving = false; 
+        isMoving = false;
     }
 
     private void Start()
@@ -52,11 +54,16 @@ public class Ball : MonoBehaviour
         rb = gameObject.GetComponent<Rigidbody>();
     }
 
-    private void Update()
+    //clean code. clean code. 
+    private void OnDestroy()
     {
-        
+        GameManager.instance.onSetEnd -= OnSetEnd;
+        GameManager.instance.onSetStart -= OnSetStart; 
     }
+    #endregion  
 
+    #region Kinematic Physics
+    //custom behavior for our very realistic ball
     private void FixedUpdate()
     {
         //grounded is false until proven otherwise 
@@ -79,8 +86,9 @@ public class Ball : MonoBehaviour
                 //if we're grounded, bounce (but not infinitely, once we slow down, let's roll)
                 if (velocity.magnitude > minBounceVelocity)
                 {
-                    //add back velocity so that ball can bounce -- and not smack on the ground 
-                    velocity = new Vector3(velocity.x, bounceHieghtMultiplier * (1f/bounces), bounceDistanceMultiplier * velocity.z);
+                    //add back velocity so that ball can bounce -- and not smack on the ground (don't divide by zero; just don't)
+                    float bounceLoss = bounces == 0 ? 1f : 1f / bounces; 
+                    velocity = new Vector3(velocity.x, bounceHieghtMultiplier * bounceLoss, bounceDistanceMultiplier * velocity.z);
                     bounces++; //the ball has bounced
                 }
 
@@ -107,7 +115,9 @@ public class Ball : MonoBehaviour
         //an adapted version of Unity's kinematic Rigidbody Platfomer Character Controller tutorial 
         //https://learn.unity.com/tutorial/live-session-2d-platformer-character-controller#5c7f8528edbc2a002053b695
     }
+    #endregion
 
+    #region debugging
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
@@ -115,4 +125,5 @@ public class Ball : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, transform.position - (Vector3.up * distance)); 
     }
+    #endregion
 }
