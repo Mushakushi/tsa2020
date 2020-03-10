@@ -83,8 +83,10 @@ public class GameManager : MonoBehaviour
         ballScript.isMoving = true;
 
         //Move player and opponent to starting positions 
-        LeanTween.move(player, playerStart.position, 10f);
-        LeanTween.move(opponent, opponentStart.position, 10f);
+        //LeanTween.move(player, playerStart.position, 10f);
+        player.transform.position = playerStart.position;
+        opponent.transform.position = opponentStart.position; 
+        //LeanTween.move(opponent, opponentStart.position, 10f);
 
         //move to winner
         if (playerScored)
@@ -97,9 +99,9 @@ public class GameManager : MonoBehaviour
         }
 
         //Wait until player is halfway between its starting point (the set DOES NOT BEGIN until players have returned to starting positions)
-        StartCoroutine(WaitUntil(() => player.transform.position == playerStart.position, onSetEnd));
-
-        ballScript.rb.position = playerScored ? player.transform.position : opponent.transform.position;
+        StartCoroutine(WaitUntil(() => player.transform.position == playerStart.position, 
+            ()=> { onSetEnd(); ballScript.rb.position = playerScored ? player.transform.position : opponent.transform.position;})
+        );
     }
 
     IEnumerator Wait(float seconds)
@@ -110,7 +112,9 @@ public class GameManager : MonoBehaviour
     IEnumerator WaitUntil(Func<bool> predicate, Action action)
     {
         if (!predicate())
+        {
             yield return null;
+        }
         action?.Invoke();
     }
 
@@ -129,7 +133,5 @@ public class GameManager : MonoBehaviour
         playerStart.position = new Vector3(opponentStart.position.x, playerStart.position.y, playerStart.position.z);
         opponentStart.position = new Vector3(temp, opponentStart.position.y, opponentStart.position.z);
         //give the ball to the winner 
-        //Hold the ball!
-        ballScript.velocity = Vector3.zero;
     }
 }

@@ -23,7 +23,27 @@ public class Ball : MonoBehaviour
     [SerializeField] private float shellRadius; 
 
     [Header("Gravity")]
-    [SerializeField] private float gravityModifier; 
+    [SerializeField] private float gravityModifier;
+
+    private void Awake()
+    {
+        GameManager.instance.onSetEnd += OnSetEnd;
+        GameManager.instance.onSetStart += OnSetStart; 
+    }
+
+    //On set end 
+    private void OnSetEnd()
+    {
+        //Hold the ball!
+        velocity = Vector3.zero;
+        isMoving = true;
+    }
+
+    //On set start 
+    private void OnSetStart()
+    {
+        isMoving = false; 
+    }
 
     private void Start()
     {
