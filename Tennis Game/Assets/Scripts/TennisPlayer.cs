@@ -10,7 +10,8 @@ public class TennisPlayer : MonoBehaviour
 
     [Header("Deck")]
     [SerializeField] protected Card[] deck = new Card[6]; //list of cards (deck) tennis player uses to play
-    [SerializeField] protected int currentCardIndex; 
+    [SerializeField] protected int currentCardIndex;
+    [SerializeField] protected ServeCard[] serveDeck = new ServeCard[3]; //list of cards tennis player uses to serve
 
     [Header("Stats")]
     [SerializeField] protected float hitForce;
@@ -58,6 +59,10 @@ public class TennisPlayer : MonoBehaviour
         deck[3] = AllCards.jumpShot_a;
         deck[4] = AllCards.normal_a;
         deck[5] = AllCards.jumpShot_a;
+
+        serveDeck[0] = AllCards.normal_s;
+        serveDeck[1] = AllCards.normal_s;
+        serveDeck[2] = AllCards.normal_s;
 
         //if is player, set up UI for deck 
         if (isPlayer)
@@ -182,7 +187,7 @@ public class TennisPlayer : MonoBehaviour
         CycleDeck(ref currentCardIndex);
 
         //tell the ball that it is no longer moving and give it velocity based on movement 
-        ballScript.velocity = transform.position - path[(int)Mathf.Ceil(path.Length/2)];
+        ballScript.velocity = isPlayer ? transform.position - path[(int)Mathf.Ceil(path.Length/2)] : path[(int)Mathf.Ceil(path.Length/2)] - transform.position;
         print("ball velocity == " + (ballScript.velocity)); 
         
         ballScript.isMoving = false;
