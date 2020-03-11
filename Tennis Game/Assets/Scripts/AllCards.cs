@@ -6,32 +6,14 @@ using UnityEngine;
 public delegate Vector3[] Path(Vector3 A, Vector3 point, Vector3 C, int capacity, bool isPlayer); //path that the ball will follow
 public delegate void Effect(Rigidbody player, Rigidbody ball); //misc effect of card
 
-//BASE CARD
-public class _Card
+//CARD
+public class Card
 {
     public Path path; //path the ball will hit
     public float speedMultiplier; //how fast will the ball be hit?
     public Effect effect; //mis effect that ball wil have (if applicable) 
     public string name; //name of the card; 
     public Color color; //color of line made by this card 
-}
-
-//Serving Cards 
-public class ServeCard : _Card
-{
-    public ServeCard(Path pathToFollow, float SpeedMultiplier, Effect misEffect, string Name, Color lineColor)
-    {
-        path = pathToFollow;
-        speedMultiplier = SpeedMultiplier;
-        effect = misEffect;
-        name = Name;
-        color = lineColor; 
-    }
-}
-
-//"Normal" Cards (exclude serving cards)
-public class Card : _Card
-{
     public int waitTime; //how long have we waited for activation after cooldown? Cards reactivate once we have waited for cooldown 
     public int coolDown; //how long it takes until this card can be used again
 
@@ -47,6 +29,7 @@ public class Card : _Card
         color = lineColor; 
     }
 }
+
 
 #region PATHS
 public class Paths
