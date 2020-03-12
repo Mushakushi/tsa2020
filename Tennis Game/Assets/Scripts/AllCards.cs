@@ -105,5 +105,5 @@ public class AllCards : MonoBehaviour
     public static Card jumpShot_a = new Card(Paths.Linear, 2f, Effects.Jump, 1, "Jump Shot", Color.red);
 
     //Serve Card
-    public static ServeCard normal_s = new ServeCard(Paths.NormalBezier, 1f, null, "Flat", Color.blue); 
+    public static Card normal_s = new Card(Paths.NormalBezier, 1.5f, null, 0, "Flat", Color.blue); 
 }

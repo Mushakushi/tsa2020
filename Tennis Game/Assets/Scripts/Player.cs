@@ -9,7 +9,7 @@ public class Player : TennisPlayer
 {
 
     [Header("Deck UI")]
-    [SerializeField] private GameObject[] deckUI = new GameObject[6];
+    [SerializeField] private GameObject[] deckUI;
     [SerializeField] private GameObject cardTemplate; //Get the original cardTemplate object 
     [SerializeField] private float moveStep;
 
@@ -29,7 +29,7 @@ public class Player : TennisPlayer
         //Get the staring position of the cards 
         start = GameObject.Find("Card UI Start").GetComponent<Transform>();
         //Go over every element in deck UI 
-        for (int i = 0; i <= deckUI.Length - 1; i++)
+        for (int i = 0; i <= activeDeck.Length - 1; i++)
         {
             //Instantiate a new card that represent its corresponding card in "deck"
             GameObject currentCard = Instantiate(cardTemplate, canvas.transform);
@@ -39,8 +39,11 @@ public class Player : TennisPlayer
             LeanTween.move(card.gameObject, start.position + (i == 0 ? Vector3.zero : Vector3.right * spacing), moveStep).setEase(easeCurve); 
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
             //Set each of the child objects to the corresponding data
-            currentCardData[0].text = deck[i].name; //set up name ONLY HERE (why do it again?)
-            UpdateCardData(ref currentCardData, deck[i].name, deck[i].waitTime); 
+            print(i); 
+            print(currentCardData[0].text);
+            print(activeDeck[i].name); 
+            currentCardData[0].text = activeDeck[i].name; //set up name ONLY HERE (why do it again?)
+            UpdateCardData(ref currentCardData, activeDeck[i].name, activeDeck[i].waitTime); 
             //add the current object to deck UI
             deckUI[i] = currentCard; 
         }
@@ -50,7 +53,7 @@ public class Player : TennisPlayer
     protected override void UpdateDeckUI(int targetIndex)
     {
         //go through every element of the deck 
-        for (int i = 0; i < deck.Length; i++)
+        for (int i = 0; i < activeDeck.Length; i++)
         {
             //EXAMPLE: 
             //{0}, {1}, {2}, {3}
@@ -61,8 +64,8 @@ public class Player : TennisPlayer
 
             int index = targetIndex + i;
             //if too big, loop back around 
-            if (index > deck.Length - 1)
-                index -= deck.Length;
+            if (index > activeDeck.Length - 1)
+                index -= activeDeck.Length;
 
             //DEBUGG
             print("moving card at index: " + index);
@@ -74,7 +77,7 @@ public class Player : TennisPlayer
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
             
             //UPDATE CARD
-            UpdateCardData(ref currentCardData, deck[i].name, deck[i].waitTime); 
+            UpdateCardData(ref currentCardData, activeDeck[i].name, activeDeck[i].waitTime); 
             
             //MOVE CARD
             //get anchoredPosition of Image componenet

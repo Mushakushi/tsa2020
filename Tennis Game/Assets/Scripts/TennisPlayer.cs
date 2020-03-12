@@ -9,9 +9,10 @@ public class TennisPlayer : MonoBehaviour
     [SerializeField] protected bool isPlayer;
 
     [Header("Deck")]
-    [SerializeField] protected Card[] deck = new Card[6]; //list of cards (deck) tennis player uses to play
+    [SerializeField] protected Card[] activeDeck; //active deck; 
     [SerializeField] protected int currentCardIndex;
-    [SerializeField] protected ServeCard[] serveDeck = new ServeCard[3]; //list of cards tennis player uses to serve
+    [SerializeField] protected Card[] setDeck = new Card[6]; //list of cards (deck) tennis player uses to play
+    [SerializeField] protected Card[] serveDeck = new Card[3]; //list of cards tennis player uses to serve
 
     [Header("Stats")]
     [SerializeField] protected float hitForce;
@@ -52,18 +53,19 @@ public class TennisPlayer : MonoBehaviour
         isPlayer = gameObject.CompareTag("Player"); //identify whether this is the player or not
         rb = gameObject.GetComponent<Rigidbody>(); //rigidbody component
 
-        //TEST
-        deck[0] = AllCards.normal_a;
-        deck[1] = AllCards.jumpShot_a;
-        deck[2] = AllCards.normal_a;
-        deck[3] = AllCards.jumpShot_a;
-        deck[4] = AllCards.normal_a;
-        deck[5] = AllCards.jumpShot_a;
+        //TEST]
+        setDeck[0] = AllCards.normal_a;
+        setDeck[1] = AllCards.jumpShot_a;
+        setDeck[2] = AllCards.normal_a;
+        setDeck[3] = AllCards.jumpShot_a;
+        setDeck[4] = AllCards.normal_a;
+        setDeck[5] = AllCards.jumpShot_a;
 
         serveDeck[0] = AllCards.normal_s;
         serveDeck[1] = AllCards.normal_s;
         serveDeck[2] = AllCards.normal_s;
 
+        activeDeck = serveDeck; 
         //if is player, set up UI for deck 
         if (isPlayer)
             SetUpDeckUI(); 
@@ -79,6 +81,7 @@ public class TennisPlayer : MonoBehaviour
 
         lineRenderer = GameObject.Find(isPlayer ? "Player Aim Line" : "Opponent Aim Line").GetComponent<LineRenderer>();
         lineRenderer.positionCount = capacity;
+        print(lineRenderer); 
     }
     #endregion
 
@@ -87,12 +90,14 @@ public class TennisPlayer : MonoBehaviour
     private void OnSetEnd()
     {
         canMove = false;
+        activeDeck = serveDeck; 
     }
 
     //What to do when the set starts
     private void OnSetStart()
     {
-        canMove = true; 
+        canMove = true;
+        activeDeck = setDeck; 
     }
 
     private void OnDestroy()
@@ -118,11 +123,11 @@ public class TennisPlayer : MonoBehaviour
         Vector3 point = netPositionTop.position;
         point = Vector3.MoveTowards(point, new Vector3(mid, point.y, point.z), 0.5f);
         //get points 
-        path = deck[currentCardIndex].path(transform.position, point, aimTarget.position, capacity, isPlayer);
+        path = activeDeck[currentCardIndex].path(transform.position, point, aimTarget.position, capacity, isPlayer);
 
         //RENDER LINE
         lineRenderer.SetPositions(path);
-        lineRenderer.startColor = deck[currentCardIndex].color; 
+        lineRenderer.startColor = activeDeck[currentCardIndex].color; 
     }
 
     private void FixedUpdate()
@@ -153,7 +158,7 @@ public class TennisPlayer : MonoBehaviour
             Vector3[] pathSnapshot = path;
 
             //Attempt to hitBall(); 
-            HitBall(ball_rb, pathSnapshot, deck[currentCardIndex].effect); 
+            HitBall(ball_rb, pathSnapshot, activeDeck[currentCardIndex].effect); 
         }
     }
 
@@ -179,7 +184,7 @@ public class TennisPlayer : MonoBehaviour
         for (int i = 0; i <= capacity - 1; i++)
         {
             //where the acutal movement comes from (kind of)
-            ball_rb.position = Vector3.Lerp(transform.position, path[i], deck[currentCardIndex].speedMultiplier);
+            ball_rb.position = Vector3.Lerp(transform.position, path[i], activeDeck[currentCardIndex].speedMultiplier);
             yield return null;
         }
 
@@ -204,16 +209,16 @@ public class TennisPlayer : MonoBehaviour
         //CURRENT CARD
         print("Cycling deck");
         //if the card that was just used has a cooldown, reset it's timer 
-        if (deck[currentIndex].coolDown > 0)
+        if (activeDeck[currentIndex].coolDown > 0)
         {
-            deck[currentIndex].waitTime = 0;
-            Debug.LogFormat("Card has been deactivated {0}", deck[currentIndex].name);
+            activeDeck[currentIndex].waitTime = 0;
+            Debug.LogFormat("Card has been deactivated {0}", activeDeck[currentIndex].name);
         }
         
         //NEW CARD
         //move to the next card in the list and get target card based on index
         int targetIndex = currentIndex;
-        Card target = deck[currentIndex]; 
+        Card target = activeDeck[currentIndex]; 
         MoveToNextCard(ref targetIndex, ref target); 
         
         //If the card has cooldown and is inactive
@@ -244,10 +249,10 @@ public class TennisPlayer : MonoBehaviour
         //move the the next card 
         index++; 
         //if outside of bounds, loop back to beginning
-        if (index > deck.Length - 1)
+        if (index > activeDeck.Length - 1)
             index = 0;
         //target Card based on the set index
-        target = deck[index];
+        target = activeDeck[index];
     }
     #endregion
 
