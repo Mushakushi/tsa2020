@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour
             ScorePoint(true);
 
         //Check if ball's position is less than 0 (that's not supposed to happen, duh)
-        if (ballScript.rb.position.y < 0f)
+        if (ballScript.rb.position.y < -1f)
             Debug.LogError("Ball REALLY went out of bounds!"); 
     }
 

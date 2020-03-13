@@ -24,15 +24,21 @@ public class Player : TennisPlayer
     //set up UI of current cards
     protected override void SetUpDeckUI()
     {
-        //Get the UI Canvas 
-        Canvas canvas = GameObject.Find("UI").GetComponent<Canvas>();
+        //Get the parent transform
+        Transform cardParent = GameObject.Find("Cards").GetComponent<Transform>(); 
+        //Clear the current cards 
+        //don't delete card ui start
+        for (int i = 1; i < cardParent.childCount; i++)
+        { 
+            Destroy(cardParent.GetChild(i).gameObject);
+        }
         //Get the staring position of the cards 
         start = GameObject.Find("Card UI Start").GetComponent<Transform>();
         //Go over every element in deck UI 
         for (int i = 0; i <= activeDeck.Length - 1; i++)
         {
             //Instantiate a new card that represent its corresponding card in "deck"
-            GameObject currentCard = Instantiate(cardTemplate, canvas.transform);
+            GameObject currentCard = Instantiate(cardTemplate, cardParent);
             //Get Image that holds card data 
             Image card = currentCard.transform.GetChild(0).gameObject.GetComponent<Image>();
             //offset the card a little

@@ -80,7 +80,6 @@ public class Ball : MonoBehaviour
             if (hitInfo.collider != null && hitInfo.collider.gameObject.CompareTag("Court Floor"))
             {
                 //normal (how the line reflects) of the ground surface
-                Vector3 groundNormal = hitInfo.normal;
                 isGrounded = true;
 
                 //if we're grounded, bounce (but not infinitely, once we slow down, let's roll)

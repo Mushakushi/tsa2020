@@ -90,14 +90,18 @@ public class TennisPlayer : MonoBehaviour
     private void OnSetEnd()
     {
         canMove = false;
-        activeDeck = serveDeck; 
+        activeDeck = serveDeck;
+        if (isPlayer) SetUpDeckUI(); 
+        print(activeDeck); 
     }
 
     //What to do when the set starts
     private void OnSetStart()
     {
         canMove = true;
-        activeDeck = setDeck; 
+        activeDeck = setDeck;
+        if (isPlayer) SetUpDeckUI(); 
+        print(activeDeck); 
     }
 
     private void OnDestroy()
@@ -192,7 +196,7 @@ public class TennisPlayer : MonoBehaviour
         CycleDeck(ref currentCardIndex);
 
         //tell the ball that it is no longer moving and give it velocity based on movement 
-        ballScript.velocity = isPlayer ? transform.position - path[(int)Mathf.Ceil(path.Length/2)] : path[(int)Mathf.Ceil(path.Length/2)] - transform.position;
+        ballScript.velocity = !isPlayer ? transform.position - path[(int)Mathf.Ceil(path.Length/2)] : path[(int)Mathf.Ceil(path.Length/2)] - transform.position;
         print("ball velocity == " + (ballScript.velocity)); 
         
         ballScript.isMoving = false;
