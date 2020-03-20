@@ -45,9 +45,6 @@ public class Player : TennisPlayer
             LeanTween.move(card.gameObject, start.position + (i == 0 ? Vector3.zero : Vector3.right * spacing), moveStep).setEase(easeCurve); 
             TMP_Text[] currentCardData = card.GetComponentsInChildren<TMP_Text>();
             //Set each of the child objects to the corresponding data
-            print(i); 
-            print(currentCardData[0].text);
-            print(activeDeck[i].name); 
             currentCardData[0].text = activeDeck[i].name; //set up name ONLY HERE (why do it again?)
             UpdateCardData(ref currentCardData, activeDeck[i].name, activeDeck[i].waitTime); 
             //add the current object to deck UI

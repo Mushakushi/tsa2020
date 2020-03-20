@@ -42,8 +42,9 @@ public class TennisPlayer : MonoBehaviour
     private void Awake()
     {
         //ADD FUNCTIONS TO GAME MANAGER EVENTS
-        GameManager.instance.onSetEnd += OnSetEnd;
-        GameManager.instance.onSetStart += OnSetStart;
+        MatchManager.instance.gameEndEvent += OnGameEnd;
+        MatchManager.instance.gameStartEvent += OnGameStart;
+        MatchManager.instance.serveEvent += OnServing; 
     }
 
     #region Start
@@ -81,37 +82,60 @@ public class TennisPlayer : MonoBehaviour
 
         lineRenderer = GameObject.Find(isPlayer ? "Player Aim Line" : "Opponent Aim Line").GetComponent<LineRenderer>();
         lineRenderer.positionCount = capacity;
-        print(lineRenderer); 
     }
     #endregion
 
     #region Events
+    //what to do before the game starts 
+    private void OnPreGame()
+    {
+
+    }
+
     //What to do when the set ends 
-    private void OnSetEnd()
+    private void OnGameEnd()
     {
         canMove = false;
         activeDeck = serveDeck;
         if (isPlayer) SetUpDeckUI(); 
-        print(activeDeck); 
+    }
+
+    //what to do when serving 
+    private void OnServing()
+    {
+        //if we are the player and are supposed to serve 
+        if (isPlayer && ScoreManager.IsPlayerServing())
+        {
+            activeDeck = setDeck;
+            SetUpDeckUI(); //set up the UI
+            //wait until the player tosses the ball
+            Utility.WaitUntil(() => Input.GetMouseButton(0), TossBall); 
+        }
+        //if we are the opponenet (if the player isn't serving, then we are)
+        else if (!isPlayer)
+        {
+            activeDeck = setDeck;
+            //opponent tosses the ball immediately 
+            TossBall(); 
+        }
+        print(activeDeck);
     }
 
     //What to do when the set starts
-    private void OnSetStart()
+    private void OnGameStart()
     {
         canMove = true;
-        activeDeck = setDeck;
-        if (isPlayer) SetUpDeckUI(); 
-        print(activeDeck); 
     }
 
     private void OnDestroy()
     {
-        GameManager.instance.onSetEnd -= OnSetEnd;
-        GameManager.instance.onSetStart -= OnSetStart; 
+        MatchManager.instance.gameEndEvent -= OnGameEnd;
+        MatchManager.instance.gameStartEvent -= OnGameStart;
+        MatchManager.instance.serveEvent -= OnServing; 
     }
     #endregion
 
-    #region Player UI
+    #region Player UI Virtual Functions
     //Set up the deck UI (only for player)
     protected virtual void SetUpDeckUI() { }
     //Update the deck UI (only for player)
@@ -166,6 +190,16 @@ public class TennisPlayer : MonoBehaviour
         }
     }
 
+    //toss the ball in the air for serving
+    private void TossBall()
+    {
+        //disable the racket 
+        transform.GetChild(0).gameObject.isStatic = true; 
+        ballScript.AddForce(Vector3.up * 2f);
+        //enable the racket so that we can hit the ball
+        Utility.WaitUntil(() => ballScript.GetVelocity().y < 0f, () => transform.GetChild(0).gameObject.isStatic = true);
+    }
+
     //Child classes will define how the process of hitting the ball works 
     protected virtual void HitBall(Rigidbody ball_rb, Vector3[] path, Effect effect) { }
     
@@ -176,7 +210,7 @@ public class TennisPlayer : MonoBehaviour
         isMoveBallRunning = true; 
 
         //Don't let ball fall
-        ballScript.isMoving = true;
+        ballScript.canMove = false;
 
         //Reset the bounce count
         ballScript.bounces = 0; 
@@ -196,10 +230,10 @@ public class TennisPlayer : MonoBehaviour
         CycleDeck(ref currentCardIndex);
 
         //tell the ball that it is no longer moving and give it velocity based on movement 
-        ballScript.velocity = !isPlayer ? transform.position - path[(int)Mathf.Ceil(path.Length/2)] : path[(int)Mathf.Ceil(path.Length/2)] - transform.position;
-        print("ball velocity == " + (ballScript.velocity)); 
+        ballScript.SetVelocity(!isPlayer ? transform.position - path[(int)Mathf.Ceil(path.Length/2)] : path[(int)Mathf.Ceil(path.Length/2)] - transform.position);
+        print("ball velocity == " + (ballScript.GetVelocity())); 
         
-        ballScript.isMoving = false;
+        ballScript.canMove = true;
 
         //this script is no longer running 
         isMoveBallRunning = false; 

@@ -24,6 +24,9 @@ public class Opponent : TennisPlayer
     {
         //hit the ball 
         if (!isMoveBallRunning && canMove)
-            StartCoroutine(MoveBall(ball_rb, path, effect)); 
+            StartCoroutine(MoveBall(ball_rb, path, effect));
+
+        //the opponent likes to go crazy sometimes
+        Utility.WaitFor(0.1f); 
     }
 }

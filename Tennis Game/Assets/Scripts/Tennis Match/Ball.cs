@@ -5,9 +5,10 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     [Header("Movement")]
-    public bool isMoving;
+    public bool canMove;
     public Rigidbody rb;
-    public Vector3 velocity;
+    //only should be used to add force
+    [SerializeField] private Vector3 velocity;
     public int bounces; 
 
     [Space]
@@ -27,8 +28,8 @@ public class Ball : MonoBehaviour
 
     private void Awake()
     {
-        GameManager.instance.onSetEnd += OnSetEnd;
-        GameManager.instance.onSetStart += OnSetStart; 
+        MatchManager.instance.gameEndEvent += OnSetEnd;
+        MatchManager.instance.serveEvent += OnServing;  
     }
 
     #region Events
@@ -37,28 +38,34 @@ public class Ball : MonoBehaviour
     {
         //Hold the ball!
         velocity = Vector3.zero;
-        isMoving = true;
+        canMove = false;
         bounces = 0;
+    }
+
+    //When serving 
+    private void OnServing()
+    {
+        canMove = true; 
     }
 
     //On set start 
     private void OnSetStart()
     {
-        isMoving = false;
+        
     }
 
     private void Start()
     {
         //not moving until proven otherwise 
-        isMoving = false;
+        canMove = false;
         rb = gameObject.GetComponent<Rigidbody>();
     }
 
     //clean code. clean code. 
     private void OnDestroy()
     {
-        GameManager.instance.onSetEnd -= OnSetEnd;
-        GameManager.instance.onSetStart -= OnSetStart; 
+        MatchManager.instance.gameEndEvent -= OnSetEnd;
+        MatchManager.instance.gameStartEvent -= OnSetStart; 
     }
     #endregion  
 
@@ -69,10 +76,10 @@ public class Ball : MonoBehaviour
         //grounded is false until proven otherwise 
         isGrounded = false;
         //if we not being slapped by a racket fall; if we're being hit, freeze (the computations...)!
-        velocity = !isMoving ? velocity /*are we bouncing?*/ + gravityModifier * Physics.gravity : Vector3.zero;
+        velocity = canMove ? velocity /*are we bouncing?*/ + gravityModifier * Physics.gravity : Vector3.zero;
 
         //if we're falling naturally, do some calculations to get us falling and colliding 
-        if (velocity.magnitude > 0.001f && !isMoving)
+        if (velocity.magnitude > 0.001f && canMove)
         {
             distance = velocity.magnitude; //length of direction that we are trying to move 
             Physics.Raycast(rb.position, Vector3.down, out hitInfo, length);
@@ -123,6 +130,25 @@ public class Ball : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position - new Vector3(0, length, 0));
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, transform.position - (Vector3.up * distance)); 
+    }
+    #endregion
+
+
+    #region Methods
+    //adds impulse force
+    public void AddForce(Vector3 force){
+        velocity += force; 
+    }
+
+    //sets the velocity of the ball
+    public void SetVelocity(Vector3 v)
+    {
+        velocity = v; 
+    }
+
+    public Vector3 GetVelocity()
+    {
+        return velocity; 
     }
     #endregion
 }
